@@ -1,14 +1,14 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import { useAuthStore } from '@/components/stores/auth.js'
-import HomeView from '@/views/HomeView.vue'
-import LoginView from '@/views/LoginView.vue'
-import RegisterView from '@/views/RegisterView.vue'
-import DashboardView from '@/views/DashboardView.vue'
-import CoursesView from '@/views/CoursesView.vue'
-import StudentsView from '@/views/StudentsView.vue'
-import FacultyView from '@/views/FacultyView.vue'
-import AdminView from '@/views/AdminView.vue'  // NEW
-import NotFound from '@/views/NotFound.vue'
+import { useAuthStore } from '@/stores/authStore'
+import HomeView from '@/views/menuView/HomeView.vue'
+import LoginView from '@/views/menuView/LoginView.vue'
+import RegisterView from '@/views/menuView/RegisterView.vue'
+import DashboardView from '@/views/menuView/DashboardView.vue'
+import CoursesView from '@/views/functionView/CoursesView.vue'
+import StudentsView from '@/views/functionView/StudentsView.vue'
+import FacultyView from '@/views/functionView/FacultyView.vue'
+import AdminView from '@/views/userView/AdminView.vue'
+import NotFound from '@/views/functionView/NotFound.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),

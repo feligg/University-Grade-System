@@ -1,6 +1,3 @@
-// COMPLETE SERVER.JS WITH ALL FIXES
-// Replace your entire server.js with this version
-
 import express from 'express';
 import cors from 'cors';
 import jwt from 'jsonwebtoken';

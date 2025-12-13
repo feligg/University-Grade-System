@@ -8,7 +8,7 @@
 </template>
 
 <script setup>
-import RegisterForm from '@/components/auth/RegisterForm.vue'
+import RegisterForm from '@/views/authView/RegisterForm.vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/components/stores/auth'
 

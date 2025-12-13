@@ -13,9 +13,10 @@
 </template>
 
 <script setup>
-import LoginForm from '@/components/auth/LoginForm.vue'
+import LoginForm from '@/views/authView/LoginForm.vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/components/stores/auth'
+
 
 const router = useRouter()
 const authStore = useAuthStore()

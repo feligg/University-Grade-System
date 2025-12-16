@@ -9,13 +9,13 @@ const __dirname = path.dirname(__filename);
 const DB_PATH = path.join(__dirname, 'university_system.db');
 const db = new sqlite3.Database(DB_PATH);
 
-// Initialize complete database
+//Init Database
 export const initializeDatabase = () => {
   return new Promise((resolve, reject) => {
     db.serialize(() => {
-      // Create all tables
+      //Create all tables
       const tables = [
-        // Departments
+        //Department
         `CREATE TABLE IF NOT EXISTS departments (
           id INTEGER PRIMARY KEY AUTOINCREMENT,
           dept_code TEXT UNIQUE NOT NULL,
@@ -23,7 +23,7 @@ export const initializeDatabase = () => {
           created_at DATETIME DEFAULT CURRENT_TIMESTAMP
         )`,
         
-        // Users
+        //User
         `CREATE TABLE IF NOT EXISTS users (
           id INTEGER PRIMARY KEY AUTOINCREMENT,
           user_id TEXT UNIQUE NOT NULL,
@@ -40,7 +40,7 @@ export const initializeDatabase = () => {
           updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
         )`,
         
-        // Students
+        //Student
         `CREATE TABLE IF NOT EXISTS students (
           id INTEGER PRIMARY KEY AUTOINCREMENT,
           user_id INTEGER NOT NULL UNIQUE,
@@ -52,7 +52,7 @@ export const initializeDatabase = () => {
           FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
         )`,
         
-        // Instructors
+        //Instructor
         `CREATE TABLE IF NOT EXISTS instructors (
           id INTEGER PRIMARY KEY AUTOINCREMENT,
           user_id INTEGER NOT NULL UNIQUE,
@@ -65,7 +65,7 @@ export const initializeDatabase = () => {
           FOREIGN KEY (dept_id) REFERENCES departments(id)
         )`,
         
-        // Semesters
+        //Semester
         `CREATE TABLE IF NOT EXISTS semesters (
           id INTEGER PRIMARY KEY AUTOINCREMENT,
           semester_code TEXT UNIQUE NOT NULL,
@@ -78,7 +78,7 @@ export const initializeDatabase = () => {
           created_at DATETIME DEFAULT CURRENT_TIMESTAMP
         )`,
         
-        // Courses
+        //Course
         `CREATE TABLE IF NOT EXISTS courses (
           id INTEGER PRIMARY KEY AUTOINCREMENT,
           course_code TEXT UNIQUE NOT NULL,
@@ -91,7 +91,7 @@ export const initializeDatabase = () => {
           FOREIGN KEY (dept_id) REFERENCES departments(id)
         )`,
         
-        // Course Prerequisites
+        //Course Prerequisite
         `CREATE TABLE IF NOT EXISTS course_prerequisites (
           id INTEGER PRIMARY KEY AUTOINCREMENT,
           course_id INTEGER NOT NULL,
@@ -102,7 +102,7 @@ export const initializeDatabase = () => {
           UNIQUE(course_id, prerequisite_course_id)
         )`,
         
-        // Time Slots
+        //Time Slot
         `CREATE TABLE IF NOT EXISTS time_slots (
           id INTEGER PRIMARY KEY AUTOINCREMENT,
           day_of_week TEXT NOT NULL CHECK(day_of_week IN ('Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday')),
@@ -111,7 +111,7 @@ export const initializeDatabase = () => {
           created_at DATETIME DEFAULT CURRENT_TIMESTAMP
         )`,
         
-        // Course Sections
+        //Course Section
         `CREATE TABLE IF NOT EXISTS course_sections (
           id INTEGER PRIMARY KEY AUTOINCREMENT,
           section_code TEXT UNIQUE NOT NULL,
@@ -127,7 +127,7 @@ export const initializeDatabase = () => {
           FOREIGN KEY (instructor_id) REFERENCES instructors(id)
         )`,
         
-        // Section Time Slots
+        //Section Time Slot
         `CREATE TABLE IF NOT EXISTS section_time_slots (
           id INTEGER PRIMARY KEY AUTOINCREMENT,
           section_id INTEGER NOT NULL,
@@ -137,7 +137,7 @@ export const initializeDatabase = () => {
           UNIQUE(section_id, time_slot_id)
         )`,
         
-        // Enrollments
+        //Enrollment
         `CREATE TABLE IF NOT EXISTS enrollments (
           id INTEGER PRIMARY KEY AUTOINCREMENT,
           student_id INTEGER NOT NULL,
@@ -153,7 +153,7 @@ export const initializeDatabase = () => {
           UNIQUE(student_id, section_id)
         )`,
         
-        // Grade Scale
+        //Grade Scale
         `CREATE TABLE IF NOT EXISTS grade_scale (
           id INTEGER PRIMARY KEY AUTOINCREMENT,
           letter_grade TEXT UNIQUE NOT NULL,
@@ -163,7 +163,7 @@ export const initializeDatabase = () => {
         )`
       ];
 
-      // Execute table creation
+      //Execute table creation
       let completed = 0;
       tables.forEach((sql, index) => {
         db.run(sql, (err) => {
@@ -182,8 +182,6 @@ export const initializeDatabase = () => {
   });
 };
 
-// Add this to your database_complete.js file to replace the seedDatabase function
-
 const seedDatabase = () => {
   return new Promise((resolve, reject) => {
     db.get("SELECT COUNT(*) as count FROM users", async (err, row) => {
@@ -194,9 +192,9 @@ const seedDatabase = () => {
 
       if (row.count === 0) {
         try {
-          console.log('🌱 Seeding database with demo accounts...');
+          console.log('demo accounts');
           
-          // Insert departments
+          //Insert departments
           const depts = [
             ['CSE', 'Computer Science and Engineering'],
             ['EE', 'Electrical Engineering'],
@@ -210,7 +208,7 @@ const seedDatabase = () => {
           }
           console.log('✅ Departments created');
 
-          // Insert admin user
+          //Insert admin user
           const adminHash = await bcrypt.hash('admin123', 10);
           await runQuery(
             `INSERT INTO users (user_id, name, email, password_hash, user_type, is_approved) 
@@ -219,7 +217,7 @@ const seedDatabase = () => {
           );
           console.log('✅ Admin account created (ID: 99999, Password: admin123)');
 
-          // Insert DEMO STUDENT
+          //Insert DEMO Student
           const studentHash = await bcrypt.hash('student123', 10);
           const studentResult = await runQuery(
             `INSERT INTO users (user_id, name, email, password_hash, user_type, gender, date_of_birth, contact_phone, is_approved) 
@@ -233,7 +231,7 @@ const seedDatabase = () => {
           );
           console.log('✅ Demo STUDENT account created (ID: 10001, Password: student123)');
 
-          // Insert more sample students
+          //Insert more sample student
           const students = [
             ['10002', 'Bob Smith', 'bob.smith@university.edu', '10002', 'Engineering', 'Electrical Engineering', 2, 2023],
             ['10003', 'Charlie Brown', 'charlie.brown@university.edu', '10003', 'Engineering', 'Mechanical Engineering', 4, 2021]
@@ -253,7 +251,7 @@ const seedDatabase = () => {
           }
           console.log('✅ Additional students created');
 
-          // Insert DEMO INSTRUCTOR
+          //Insert DEMO Instructor
           const instructorHash = await bcrypt.hash('instructor123', 10);
           const instructorResult = await runQuery(
             `INSERT INTO users (user_id, name, email, password_hash, user_type, gender, contact_phone, is_approved) 
@@ -267,7 +265,7 @@ const seedDatabase = () => {
           );
           console.log('✅ Demo INSTRUCTOR account created (ID: 20001, Password: instructor123)');
 
-          // Insert more instructors
+          //Insert more instructor sample
           const instructors = [
             ['20002', 'Prof. Michael Davis', 'michael.davis@university.edu', '20002', 1, 'Associate Professor', 'Building B, Room 205', 'Tue-Thu 3-5 PM'],
             ['20003', 'Dr. Sarah Wilson', 'sarah.wilson@university.edu', '20003', 2, 'Assistant Professor', 'Building C, Room 102', 'Mon-Fri 1-2 PM']
@@ -287,7 +285,7 @@ const seedDatabase = () => {
           }
           console.log('✅ Additional instructors created');
 
-          // Insert semester
+          //Insert semester
           await runQuery(
             `INSERT INTO semesters (semester_code, semester_name, start_date, end_date, registration_start, registration_end, is_active) 
              VALUES (?, ?, ?, ?, ?, ?, ?)`,
@@ -295,7 +293,7 @@ const seedDatabase = () => {
           );
           console.log('✅ Semester created');
 
-          // Insert time slots
+          //Insert time slot
           const timeSlots = [
             ['Monday', '08:00', '09:30'],
             ['Monday', '10:00', '11:30'],
@@ -312,7 +310,7 @@ const seedDatabase = () => {
           }
           console.log('✅ Time slots created');
 
-          // Insert courses
+          //Insert course 
           const courses = [
             ['CS101', 'Introduction to Computer Science', 'Basic programming concepts and problem solving', 3, 1, 'general_required'],
             ['CS201', 'Data Structures and Algorithms', 'Advanced data structures and algorithm analysis', 4, 1, 'major_required'],
@@ -330,7 +328,7 @@ const seedDatabase = () => {
           }
           console.log('✅ Courses created');
 
-          // Insert course prerequisites
+          //Insert course prerequisite
           await runQuery(
             'INSERT INTO course_prerequisites (course_id, prerequisite_course_id, minimum_grade) VALUES (?, ?, ?)',
             [2, 1, 'C']
@@ -341,7 +339,7 @@ const seedDatabase = () => {
           );
           console.log('✅ Prerequisites created');
 
-          // Insert course sections
+          //Insert course section
           const sections = [
             ['CS101-01', 1, 1, 1, 35, 15, 'Room A101'],
             ['CS201-01', 2, 1, 2, 30, 12, 'Room B205'],
@@ -359,14 +357,14 @@ const seedDatabase = () => {
           }
           console.log('✅ Course sections created');
 
-          // Insert section time slots
+          //Insert section time slot
           await runQuery('INSERT INTO section_time_slots (section_id, time_slot_id) VALUES (?, ?)', [1, 1]);
           await runQuery('INSERT INTO section_time_slots (section_id, time_slot_id) VALUES (?, ?)', [1, 3]);
           await runQuery('INSERT INTO section_time_slots (section_id, time_slot_id) VALUES (?, ?)', [2, 2]);
           await runQuery('INSERT INTO section_time_slots (section_id, time_slot_id) VALUES (?, ?)', [2, 4]);
           console.log('✅ Section time slots created');
 
-          // Insert grade scale
+          //Insert grade scale
           const grades = [
             ['A+', 95, 100, 4.0], ['A', 90, 94.99, 4.0], ['A-', 85, 89.99, 3.7],
             ['B+', 80, 84.99, 3.3], ['B', 75, 79.99, 3.0], ['B-', 70, 74.99, 2.7],
@@ -382,7 +380,7 @@ const seedDatabase = () => {
           }
           console.log('✅ Grade scale created');
 
-          // Insert sample enrollments for demo student
+          //Insert sample enrollments for demo student
           await runQuery(
             'INSERT INTO enrollments (student_id, section_id, enrollment_status, numeric_grade, final_grade, grade_points) VALUES (?, ?, ?, ?, ?, ?)',
             [1, 1, 'passed', 88, 'A-', 3.7]
@@ -428,7 +426,8 @@ const seedDatabase = () => {
     });
   });
 };
-// Helper function to promisify db.run
+
+//Helper function to promisify db.run
 const runQuery = (sql, params = []) => {
   return new Promise((resolve, reject) => {
     db.run(sql, params, function(err) {
@@ -438,7 +437,7 @@ const runQuery = (sql, params = []) => {
   });
 };
 
-// Helper function to promisify db.get
+//Helper function to promisify db.get
 const getQuery = (sql, params = []) => {
   return new Promise((resolve, reject) => {
     db.get(sql, params, (err, row) => {
@@ -448,7 +447,7 @@ const getQuery = (sql, params = []) => {
   });
 };
 
-// Helper function to promisify db.all
+//Helper function to promisify db.all
 const allQuery = (sql, params = []) => {
   return new Promise((resolve, reject) => {
     db.all(sql, params, (err, rows) => {
@@ -458,7 +457,7 @@ const allQuery = (sql, params = []) => {
   });
 };
 
-// USER OPERATIONS
+//User Operations
 export const findUserByUserId = (userId) => {
   return getQuery('SELECT * FROM users WHERE user_id = ?', [userId]);
 };
@@ -497,7 +496,7 @@ export const verifyPassword = async (userId, password) => {
   return userWithoutPassword;
 };
 
-// STUDENT OPERATIONS
+//Student Operation
 export const createStudent = async (userId, studentData) => {
   const { studentId, college, major, year, enrollmentYear } = studentData;
   return runQuery(
@@ -525,7 +524,7 @@ export const getAllStudents = () => {
   );
 };
 
-// INSTRUCTOR OPERATIONS
+//Instructor Operation
 export const createInstructor = async (userId, instructorData) => {
   const { instructorId, deptId, title, office, hours } = instructorData;
   return runQuery(
@@ -555,7 +554,7 @@ export const getAllInstructors = () => {
   );
 };
 
-// COURSE OPERATIONS
+//Course Operation
 export const getAllCourses = () => {
   return allQuery(
     `SELECT c.*, d.dept_name, d.dept_code
@@ -589,7 +588,7 @@ export const getCourseWithSections = (courseId) => {
   );
 };
 
-// ENROLLMENT OPERATIONS
+//Enrollment Operation
 export const enrollStudent = async (studentId, sectionId) => {
   // Check capacity
   const section = await getQuery('SELECT * FROM course_sections WHERE id = ?', [sectionId]);
@@ -597,7 +596,7 @@ export const enrollStudent = async (studentId, sectionId) => {
     throw new Error('Section is full');
   }
   
-  // Check for time conflicts
+  //Check for time conflict
   const conflicts = await allQuery(
     `SELECT COUNT(*) as count FROM enrollments e
      JOIN course_sections cs1 ON e.section_id = cs1.id
@@ -651,12 +650,12 @@ export const getStudentGPA = async (studentId) => {
   return (result.total_grade_points / result.total_credits).toFixed(2);
 };
 
-// DEPARTMENT OPERATIONS
+//Department Operation
 export const getAllDepartments = () => {
   return allQuery('SELECT * FROM departments ORDER BY dept_code');
 };
 
-// SEMESTER OPERATIONS
+//Semester Operation
 export const getActiveSemester = () => {
   return getQuery('SELECT * FROM semesters WHERE is_active = 1');
 };

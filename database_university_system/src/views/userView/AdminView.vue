@@ -238,7 +238,7 @@
 
             <div class="form-group">
               <label>Assign Instructor</label>
-              <select v-model.number="courseForm.instructor_id">
+              <select v-model.number="courseForm.instructor_id" >
                 <option :value="null">No Instructor Assigned</option>
                 <option v-for="instructor in instructors" :key="instructor.id" :value="instructor.id">
                   {{ instructor.name }} ({{ instructor.instructor_id }}) - {{ instructor.dept_name }}

@@ -26,11 +26,11 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 const JWT_SECRET = process.env.JWT_SECRET || 'your-super-secret-jwt-key-change-in-production';
 
-// Middleware
+//Middleware
 app.use(cors());
 app.use(express.json());
 
-// Initialize database
+//Init Database
 initializeDatabase()
   .then(() => {
     console.log('Database initialized successfully');
@@ -40,7 +40,7 @@ initializeDatabase()
     process.exit(1);
   });
 
-// Helper functions for database queries
+//Helper functions for database queries
 const runQuery = (sql, params = []) => {
   return new Promise((resolve, reject) => {
     db.run(sql, params, function(err) {
@@ -68,12 +68,12 @@ const allQuery = (sql, params = []) => {
   });
 };
 
-// Helper function to generate JWT token
+//Helper function to generate JWT token
 const generateToken = (userId, userType) => {
   return jwt.sign({ userId, userType }, JWT_SECRET, { expiresIn: '24h' });
 };
 
-// Middleware to verify JWT token
+//Middleware to verify JWT token
 const authenticateToken = (req, res, next) => {
   const authHeader = req.headers['authorization'];
   const token = authHeader && authHeader.split(' ')[1];
@@ -92,7 +92,7 @@ const authenticateToken = (req, res, next) => {
   });
 };
 
-// Middleware to check if user is admin
+//Middleware to check if user is admin
 const isAdmin = (req, res, next) => {
   if (req.userType !== 'admin') {
     return res.status(403).json({ message: 'Admin access required' });
@@ -100,8 +100,7 @@ const isAdmin = (req, res, next) => {
   next();
 };
 
-// ==================== AUTH ROUTES ====================
-
+//====================Auth Route====================
 app.post('/api/auth/login', async (req, res) => {
   try {
     const { user_id, password } = req.body;
@@ -150,7 +149,7 @@ app.post('/api/auth/register', async (req, res) => {
       address: additionalData.contact_address
     });
 
-    // Create student or instructor profile
+    //Create student or instructor profile
     if (user_type === 'student') {
       await createStudent(newUser.id, {
         studentId: user_id,
@@ -194,8 +193,7 @@ app.get('/api/auth/verify', authenticateToken, async (req, res) => {
   }
 });
 
-// ==================== STUDENT ROUTES ====================
-
+//====================Student Route====================
 app.get('/api/student/profile', authenticateToken, async (req, res) => {
   try {
     const student = await getStudentByUserId(req.userId);
@@ -244,8 +242,7 @@ app.get('/api/students/:id/enrollments', authenticateToken, async (req, res) => 
   }
 });
 
-// ==================== INSTRUCTOR ROUTES ====================
-
+//====================Instructor Route====================
 app.get('/api/instructor/profile', authenticateToken, async (req, res) => {
   try {
     const instructor = await getInstructorByUserId(req.userId);
@@ -287,8 +284,7 @@ app.get('/api/instructors/:id/courses', authenticateToken, async (req, res) => {
   }
 });
 
-// ==================== COURSE ROUTES ====================
-
+//====================Course Route====================
 app.get('/api/courses', authenticateToken, async (req, res) => {
   try {
     const courses = await getAllCourses();
@@ -322,8 +318,7 @@ app.get('/api/courses/:id/sections', authenticateToken, async (req, res) => {
   }
 });
 
-// ==================== ENROLLMENT ROUTES (FIXED) ====================
-
+//====================Enrollment Route====================
 app.post('/api/enrollments', authenticateToken, async (req, res) => {
   try {
     const { section_id } = req.body;
@@ -334,7 +329,7 @@ app.post('/api/enrollments', authenticateToken, async (req, res) => {
       return res.status(400).json({ message: 'Section ID is required' });
     }
 
-    // Get student ID from user ID
+    //Get student ID from user ID
     const student = await getQuery(
       'SELECT id FROM students WHERE user_id = ?',
       [req.userId]
@@ -346,7 +341,7 @@ app.post('/api/enrollments', authenticateToken, async (req, res) => {
 
     console.log('Student found:', student.id);
 
-    // Check if already enrolled
+    //Check if already enrolled
     const existing = await getQuery(
       'SELECT id FROM enrollments WHERE student_id = ? AND section_id = ?',
       [student.id, section_id]
@@ -356,7 +351,7 @@ app.post('/api/enrollments', authenticateToken, async (req, res) => {
       return res.status(400).json({ message: 'Already enrolled in this section' });
     }
 
-    // Check section capacity
+    //Check section capacity
     const section = await getQuery(
       'SELECT * FROM course_sections WHERE id = ?',
       [section_id]
@@ -370,7 +365,7 @@ app.post('/api/enrollments', authenticateToken, async (req, res) => {
       return res.status(400).json({ message: 'Section is full' });
     }
     
-    // Check for time conflicts
+    //Check for time conflicts
     const conflicts = await getQuery(
       `SELECT COUNT(*) as count FROM enrollments e
        JOIN course_sections cs1 ON e.section_id = cs1.id
@@ -388,13 +383,13 @@ app.post('/api/enrollments', authenticateToken, async (req, res) => {
       return res.status(400).json({ message: 'Time conflict with existing enrollment' });
     }
     
-    // Enroll student
+    //Enroll student
     const result = await runQuery(
       'INSERT INTO enrollments (student_id, section_id, enrollment_status) VALUES (?, ?, ?)',
       [student.id, section_id, 'enrolled']
     );
     
-    // Update section enrollment count
+    //Update section enrollment count
     await runQuery(
       'UPDATE course_sections SET current_enrollment = current_enrollment + 1 WHERE id = ?',
       [section_id]
@@ -412,8 +407,7 @@ app.post('/api/enrollments', authenticateToken, async (req, res) => {
   }
 });
 
-// ==================== GRADE MANAGEMENT (FIXED) ====================
-
+//====================Grade Management====================
 app.put('/api/enrollments/:id/grade', authenticateToken, async (req, res) => {
   try {
     const { id } = req.params;
@@ -438,12 +432,12 @@ app.put('/api/enrollments/:id/grade', authenticateToken, async (req, res) => {
     console.log('Enrollment found:', enrollment);
     console.log('Current user:', req.userId, 'Instructor:', enrollment.instructor_user_id);
 
-    // Check if user is the instructor for this course
+    //Check if user is the instructor for this course
     if (enrollment.instructor_user_id !== req.userId && req.userType !== 'admin') {
       return res.status(403).json({ message: 'Not authorized to grade this enrollment' });
     }
 
-    // Calculate grade points based on letter grade
+    //Calculate grade points based on letter grade
     const gradePointMap = {
       'A+': 4.0, 'A': 4.0, 'A-': 3.7,
       'B+': 3.3, 'B': 3.0, 'B-': 2.7,
@@ -452,7 +446,7 @@ app.put('/api/enrollments/:id/grade', authenticateToken, async (req, res) => {
     };
     const grade_points = gradePointMap[final_grade] || 0;
 
-    // Update enrollment
+    //Update enrollment
     await runQuery(
       `UPDATE enrollments 
        SET numeric_grade = ?, final_grade = ?, grade_points = ?, enrollment_status = ?, updated_at = CURRENT_TIMESTAMP
@@ -476,8 +470,7 @@ app.put('/api/enrollments/:id/grade', authenticateToken, async (req, res) => {
   }
 });
 
-// ==================== DEPARTMENT ROUTES ====================
-
+//====================Department Route====================
 app.get('/api/departments', async (req, res) => {
   try {
     const departments = await getAllDepartments();
@@ -489,8 +482,7 @@ app.get('/api/departments', async (req, res) => {
   }
 });
 
-// ==================== SEMESTER ROUTES ====================
-
+//====================Semester Route====================
 app.get('/api/semesters/active', authenticateToken, async (req, res) => {
   try {
     const semester = await getActiveSemester();
@@ -501,14 +493,11 @@ app.get('/api/semesters/active', authenticateToken, async (req, res) => {
   }
 });
 
-// Add these routes to your server.js file
-
-// ==================== ADMIN COURSE MANAGEMENT ====================
-
-// Create new course
+//====================Admin Course Management====================
+//Create new course
 app.post('/api/courses', authenticateToken, isAdmin, async (req, res) => {
   try {
-    const { course_code, course_name, description, credits, dept_id, course_type } = req.body;
+    const { course_code, course_name, description, credits, dept_id, course_type, instructor_id } = req.body;
 
     if (!course_code || !course_name || !credits || !dept_id || !course_type) {
       return res.status(400).json({ message: 'Required fields missing' });
@@ -533,7 +522,7 @@ app.post('/api/courses', authenticateToken, isAdmin, async (req, res) => {
   }
 });
 
-// Update course
+//Update course
 app.put('/api/courses/:id', authenticateToken, isAdmin, async (req, res) => {
   try {
     const { id } = req.params;
@@ -553,7 +542,7 @@ app.put('/api/courses/:id', authenticateToken, isAdmin, async (req, res) => {
   }
 });
 
-// Delete course
+//Delete course
 app.delete('/api/courses/:id', authenticateToken, isAdmin, async (req, res) => {
   try {
     const { id } = req.params;
@@ -567,22 +556,21 @@ app.delete('/api/courses/:id', authenticateToken, isAdmin, async (req, res) => {
   }
 });
 
-// ==================== ADMIN STUDENT MANAGEMENT ====================
-
-// Update student
+//===================Admin Student Management====================
+//Update student
 app.put('/api/students/:id', authenticateToken, isAdmin, async (req, res) => {
   try {
     const { id } = req.params;
     const { name, email, major, college, year_of_study, gender, contact_phone } = req.body;
 
-    // Get the student record to find user_id
+    //Get the student record to find user_id
     const student = await getQuery('SELECT user_id FROM students WHERE id = ?', [id]);
     
     if (!student) {
       return res.status(404).json({ message: 'Student not found' });
     }
 
-    // Update users table
+    //Update users table
     await runQuery(
       `UPDATE users 
        SET name = ?, email = ?, gender = ?, contact_phone = ?, updated_at = CURRENT_TIMESTAMP
@@ -590,7 +578,7 @@ app.put('/api/students/:id', authenticateToken, isAdmin, async (req, res) => {
       [name, email, gender, contact_phone, student.user_id]
     );
 
-    // Update students table
+    //Update students table
     await runQuery(
       `UPDATE students 
        SET major = ?, college = ?, year_of_study = ?
@@ -608,22 +596,21 @@ app.put('/api/students/:id', authenticateToken, isAdmin, async (req, res) => {
   }
 });
 
-// ==================== ADMIN INSTRUCTOR MANAGEMENT ====================
-
-// Update instructor
+//====================Admin Instructor Management====================
+//Update instructor
 app.put('/api/instructors/:id', authenticateToken, isAdmin, async (req, res) => {
   try {
     const { id } = req.params;
     const { name, email, dept_id, title, office_location, office_hours, contact_phone } = req.body;
 
-    // Get the instructor record to find user_id
+    //Get the instructor record to find user_id
     const instructor = await getQuery('SELECT user_id FROM instructors WHERE id = ?', [id]);
     
     if (!instructor) {
       return res.status(404).json({ message: 'Instructor not found' });
     }
 
-    // Update users table
+    //Update users table
     await runQuery(
       `UPDATE users 
        SET name = ?, email = ?, contact_phone = ?, updated_at = CURRENT_TIMESTAMP
@@ -631,7 +618,7 @@ app.put('/api/instructors/:id', authenticateToken, isAdmin, async (req, res) => 
       [name, email, contact_phone, instructor.user_id]
     );
 
-    // Update instructors table
+    //Update instructors table
     await runQuery(
       `UPDATE instructors 
        SET dept_id = ?, title = ?, office_location = ?, office_hours = ?
@@ -649,30 +636,29 @@ app.put('/api/instructors/:id', authenticateToken, isAdmin, async (req, res) => 
   }
 });
 
-// ==================== HEALTH CHECK ====================
-
+//====================Heatlth Check====================
 app.get('/api/health', (req, res) => {
   res.json({ status: 'OK', message: 'Server is running' });
 });
 
-// Error handling middleware
+//Error handling middleware
 app.use((err, req, res, next) => {
   console.error(err.stack);
   res.status(500).json({ message: 'Something went wrong!' });
 });
 
-// 404 handler
+//404 handler
 app.use('*', (req, res) => {
   res.status(404).json({ message: 'Endpoint not found' });
 });
 
-// Start server
+//Start server
 app.listen(PORT, () => {
   console.log(`Server running on http://localhost:${PORT}`);
   console.log(`API available at http://localhost:${PORT}/api`);
 });
 
-// Graceful shutdown
+//Shutdown
 process.on('SIGINT', () => {
   console.log('Shutting down server...');
   process.exit(0);

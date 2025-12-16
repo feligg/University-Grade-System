@@ -1,30 +1,5 @@
 <template>
   <div class="dashboard">
-    <!-- Role Switcher (for demo/testing) -->
-    <div class="role-switcher" v-if="authStore.isAdmin">
-      <button 
-        @click="viewAs = 'student'" 
-        :class="{ active: viewAs === 'student' }"
-        class="role-btn"
-      >
-        👨‍🎓 View as Student
-      </button>
-      <button 
-        @click="viewAs = 'instructor'" 
-        :class="{ active: viewAs === 'instructor' }"
-        class="role-btn"
-      >
-        👨‍🏫 View as Instructor
-      </button>
-      <button 
-        @click="viewAs = 'admin'" 
-        :class="{ active: viewAs === 'admin' }"
-        class="role-btn"
-      >
-        👨‍💼 View as Admin
-      </button>
-    </div>
-
     <!-- Dashboard Header -->
     <div class="dashboard-header">
       <div>
@@ -48,7 +23,7 @@
     </div>
 
     <!-- Student Dashboard -->
-    <div v-else-if="currentView === 'student'" class="dashboard-content">
+    <div v-else-if="authStore.isStudent" class="dashboard-content">
       <div class="stats-grid">
         <div class="stat-card">
           <div class="stat-icon">📚</div>
@@ -154,7 +129,7 @@
     </div>
 
     <!-- Instructor Dashboard -->
-    <div v-else-if="currentView === 'instructor'" class="dashboard-content">
+    <div v-else-if="authStore.isInstructor" class="dashboard-content">
       <div class="stats-grid">
         <div class="stat-card">
           <div class="stat-icon">👥</div>
@@ -263,10 +238,14 @@
     </div>
 
     <!-- Admin Dashboard -->
-    <div v-else-if="currentView === 'admin'" class="dashboard-content">
-      <div class="card">
+    <div v-else-if="authStore.isAdmin" class="dashboard-content">
+      <div class="card admin-welcome">
         <h2>Administrator Panel</h2>
-        <p>Admin dashboard features coming soon...</p>
+        <p>Manage the university system from the admin panel.</p>
+        <router-link to="/admin" class="btn-admin-panel">
+          <span class="icon">👨‍💼</span>
+          <span>Go to Admin Panel</span>
+        </router-link>
       </div>
     </div>
   </div>
@@ -286,14 +265,8 @@ const error = ref(null)
 const profile = ref(null)
 const enrollments = ref([])
 const instructorCourses = ref([])
-const viewAs = ref(null)
 
 // Computed
-const currentView = computed(() => {
-  if (viewAs.value) return viewAs.value
-  return authStore.userType || 'student'
-})
-
 const displayName = computed(() => {
   if (profile.value?.name) return profile.value.name
   if (authStore.user?.name) return authStore.user.name
@@ -301,14 +274,14 @@ const displayName = computed(() => {
 })
 
 const displayRole = computed(() => {
-  const role = currentView.value
+  const role = authStore.userType || 'user'
   return role.charAt(0).toUpperCase() + role.slice(1)
 })
 
 const displayId = computed(() => {
-  if (currentView.value === 'student') {
+  if (authStore.isStudent) {
     return `Student ID: ${profile.value?.student_id || authStore.user?.user_id || 'N/A'}`
-  } else if (currentView.value === 'instructor') {
+  } else if (authStore.isInstructor) {
     return `Instructor ID: ${profile.value?.instructor_id || authStore.user?.user_id || 'N/A'}`
   }
   return `User ID: ${authStore.user?.user_id || 'N/A'}`
@@ -402,38 +375,6 @@ onMounted(() => {
   max-width: 1400px;
   margin: 0 auto;
   padding: 2rem;
-}
-
-.role-switcher {
-  display: flex;
-  gap: 0.5rem;
-  margin-bottom: 1.5rem;
-  padding: 1rem;
-  background: white;
-  border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-}
-
-.role-btn {
-  flex: 1;
-  padding: 0.75rem;
-  border: 2px solid #e5e7eb;
-  background: white;
-  border-radius: 6px;
-  cursor: pointer;
-  font-weight: 600;
-  transition: all 0.2s;
-}
-
-.role-btn:hover {
-  border-color: #667eea;
-  background: #f9fafb;
-}
-
-.role-btn.active {
-  border-color: #667eea;
-  background: #667eea;
-  color: white;
 }
 
 .dashboard-header {
@@ -566,6 +507,40 @@ h1 {
 .card h2 {
   margin: 0 0 1.5rem 0;
   color: #374151;
+  font-size: 1.5rem;
+}
+
+.admin-welcome {
+  text-align: center;
+  padding: 3rem;
+}
+
+.admin-welcome p {
+  color: #6b7280;
+  margin-bottom: 2rem;
+  font-size: 1.1rem;
+}
+
+.btn-admin-panel {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 1rem 2rem;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  text-decoration: none;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 1.1rem;
+  transition: all 0.3s ease;
+}
+
+.btn-admin-panel:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+}
+
+.btn-admin-panel .icon {
   font-size: 1.5rem;
 }
 
@@ -727,10 +702,6 @@ h1 {
 
   .info-grid {
     grid-template-columns: 1fr;
-  }
-
-  .role-switcher {
-    flex-direction: column;
   }
 
   .actions-grid {

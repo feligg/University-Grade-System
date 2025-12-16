@@ -160,6 +160,7 @@
       </div>
     </div>
 
+   
     <!-- Course Modal -->
     <div v-if="showCourseModal" class="modal-overlay" @click="closeCourseModal">
       <div class="modal-content" @click.stop>
@@ -233,6 +234,17 @@
                   <option value="practical">Practical</option>
                 </select>
               </div>
+            </div>
+
+            <div class="form-group">
+              <label>Assign Instructor</label>
+              <select v-model.number="courseForm.instructor_id">
+                <option :value="null">No Instructor Assigned</option>
+                <option v-for="instructor in instructors" :key="instructor.id" :value="instructor.id">
+                  {{ instructor.name }} ({{ instructor.instructor_id }}) - {{ instructor.dept_name }}
+                </option>
+              </select>
+              <p class="form-hint">Select an instructor to assign to this course</p>
             </div>
 
             <div v-if="saveError" class="alert alert-error">
@@ -549,7 +561,10 @@ const fetchDepartments = async () => {
 const openCourseModal = (course = null) => {
   editingCourse.value = course;
   if (course) {
-    courseForm.value = { ...course };
+    courseForm.value = { 
+      ...course,
+      instructor_id: course.instructor_id || null
+    };
   } else {
     courseForm.value = {
       course_code: '',
@@ -557,7 +572,8 @@ const openCourseModal = (course = null) => {
       description: '',
       credits: 3,
       dept_id: '',
-      course_type: ''
+      course_type: '',
+      instructor_id: null
     };
   }
   showCourseModal.value = true;
@@ -1117,3 +1133,4 @@ onMounted(() => {
   }
 }
 </style>
+

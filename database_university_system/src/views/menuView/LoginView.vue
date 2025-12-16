@@ -1,14 +1,6 @@
 <template>
   <div class="login-page">
-    <div class="login-container">
-      <h1>Login</h1>
       <LoginForm @submit="handleLogin" />
-
-      <div class="register-link">
-        Don't have an account?
-        <router-link to="/register" class="link">Register here</router-link>
-      </div>
-    </div>
   </div>
 </template>
 

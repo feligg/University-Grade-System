@@ -1,10 +1,7 @@
 <template>
   <div class="register-page">
-    <div class="register-container">
-      <h1>Create Account</h1>
       <RegisterForm @submit="handleRegister" @switch-to-login="switchToLogin" />
     </div>
-  </div>
 </template>
 
 <script setup>

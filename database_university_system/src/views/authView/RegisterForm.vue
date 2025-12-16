@@ -3,7 +3,7 @@
     <div class="register-container">
       <h1>Create Account</h1>
       
-      <!-- Role Selection Buttons -->
+      <!--Role Selection Buttons-->
       <div class="role-selector">
         <button 
           @click="selectedRole = 'student'" 
@@ -21,9 +21,9 @@
         </button>
       </div>
 
-      <!-- Registration Form -->
+      <!--Registration Form-->
       <form @submit.prevent="handleRegister" class="register-form">
-        <!-- User ID Field -->
+        <!--User ID Field-->
         <div class="form-group" :class="{ 'has-error': errors.userId }">
           <label for="user_id">
             {{ selectedRole === 'student' ? 'Student ID *' : 'Instructor ID *' }}
@@ -41,7 +41,7 @@
           <span v-else class="helper-text">Must be numbers only (e.g., 12345)</span>
         </div>
 
-        <!-- Name Field -->
+        <!--Name Field-->
         <div class="form-group" :class="{ 'has-error': errors.name }">
           <label for="name">Full Name *</label>
           <input
@@ -56,7 +56,7 @@
           <span v-if="errors.name" class="error-message">{{ errors.name }}</span>
         </div>
 
-        <!-- Email Field -->
+        <!--Email Field-->
         <div class="form-group" :class="{ 'has-error': errors.email }">
           <label for="email">Email Address *</label>
           <input
@@ -71,7 +71,7 @@
           <span v-if="errors.email" class="error-message">{{ errors.email }}</span>
         </div>
 
-        <!-- Student-specific fields -->
+        <!--Student-specific fields-->
         <template v-if="selectedRole === 'student'">
           <div class="form-group">
             <label for="program">Program</label>
@@ -100,7 +100,7 @@
           </div>
         </template>
 
-        <!-- Instructor-specific fields -->
+        <!--Instructor-specific fields-->
         <template v-if="selectedRole === 'instructor'">
           <div class="form-group" :class="{ 'has-error': errors.department }">
             <label for="department">Department *</label>
@@ -155,7 +155,7 @@
           </div>
         </template>
 
-        <!-- Password Fields -->
+        <!--Password Fields-->
         <div class="form-group" :class="{ 'has-error': errors.password }">
           <label for="password">Password *</label>
           <div class="password-wrapper">
@@ -207,19 +207,19 @@
           <span v-if="errors.confirmPassword" class="error-message">{{ errors.confirmPassword }}</span>
         </div>
 
-        <!-- Server Error Alert -->
+        <!--Server Error Alert-->
         <div v-if="serverError" class="alert alert-error">
           <span class="alert-icon">⚠️</span>
           {{ serverError }}
         </div>
 
-        <!-- Success Message -->
+        <!--Success Message-->
         <div v-if="successMessage" class="alert alert-success">
           <span class="alert-icon">✓</span>
           {{ successMessage }}
         </div>
 
-        <!-- Submit Button -->
+        <!--Submit Button-->
         <button type="submit" class="btn-primary" :disabled="isLoading || !isFormValid">
           <span v-if="isLoading" class="loading-spinner">⏳</span>
           <span>{{ isLoading ? 'Creating Account...' : 'Register' }}</span>
@@ -242,7 +242,7 @@ import { useAuthStore } from '@/components/stores/auth'
 const router = useRouter()
 const authStore = useAuthStore()
 
-// State
+//State
 const selectedRole = ref('student')
 const userId = ref('')
 const name = ref('')
@@ -263,14 +263,14 @@ const successMessage = ref('')
 const isLoading = ref(false)
 const departments = ref([])
 
-// Computed
+//Computed
 const isFormValid = computed(() => {
   const baseValid = userId.value && name.value && email.value && password.value && confirmPassword.value
   const instructorValid = selectedRole.value === 'instructor' ? department.value : true
   return baseValid && instructorValid && Object.keys(errors.value).length === 0
 })
 
-// Load departments
+//Load departments
 const loadDepartments = async () => {
   try {
     const response = await fetch('http://localhost:3000/api/departments')
@@ -285,7 +285,7 @@ const loadDepartments = async () => {
   }
 }
 
-// Validation
+//Validation
 const validateUserId = () => {
   if (!userId.value) {
     errors.value.userId = `${selectedRole.value === 'student' ? 'Student' : 'Instructor'} ID is required`
@@ -370,12 +370,12 @@ const clearFieldError = (field) => {
   successMessage.value = ''
 }
 
-// Handle registration
+//Handle registration
 const handleRegister = async () => {
   serverError.value = ''
   successMessage.value = ''
 
-  // Validate all fields
+  //Validate all fields
   const validations = [
     validateUserId(),
     validateName(),
@@ -405,7 +405,7 @@ const handleRegister = async () => {
       user_type: selectedRole.value
     }
 
-    // Add role-specific data
+    //Add role-specific data
     if (selectedRole.value === 'student') {
       userData.college = 'Engineering'
       userData.major = program.value || 'Undeclared'
@@ -432,7 +432,7 @@ const handleRegister = async () => {
 
     const data = await response.json()
     
-    // Store in auth store
+    //Store in auth store
     authStore.user = data.user
     authStore.token = data.token
     localStorage.setItem('authToken', data.token)
@@ -456,7 +456,7 @@ const handleRegister = async () => {
   }
 }
 
-// Lifecycle
+//Lifecycle
 onMounted(() => {
   loadDepartments()
 })

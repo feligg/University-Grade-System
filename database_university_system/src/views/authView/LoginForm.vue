@@ -3,9 +3,9 @@
     <div class="login-container">
       <h1>Login</h1>
 
-      <!-- Login Form -->
+      <!--Login Form-->
       <form @submit.prevent="handleLogin" class="login-form">
-        <!-- User ID Field -->
+        <!--User ID Field-->
         <div class="form-group" :class="{ 'has-error': errors.userId }">
           <label for="user_id">User ID</label>
           <input 
@@ -22,7 +22,7 @@
           </span>
         </div>
         
-        <!-- Password Field -->
+        <!--Password Field-->
         <div class="form-group" :class="{ 'has-error': errors.password }">
           <label for="password">Password</label>
           <div class="password-wrapper">
@@ -50,25 +50,25 @@
           </span>
         </div>
 
-        <!-- Server Error Alert -->
+        <!--Server Error Alert-->
         <div v-if="serverError" class="alert alert-error">
           <span class="alert-icon">⚠️</span>
           {{ serverError }}
         </div>
 
-        <!-- Success Message -->
+        <!--Success Message-->
         <div v-if="successMessage" class="alert alert-success">
           <span class="alert-icon">✓</span>
           {{ successMessage }}
         </div>
 
-        <!-- Submit Button -->
+        <!--Submit Button-->
         <button type="submit" class="btn-primary" :disabled="isLoading || !isFormValid">
           <span v-if="isLoading" class="loading-spinner">⏳</span>
           <span>{{ isLoading ? 'Logging in...' : 'Login' }}</span>
         </button>
 
-        <!-- Additional Links -->
+        <!--Additional Links-->
         <div class="form-footer">
           <a href="#" class="link" @click.prevent="handleForgotPassword">
             Forgot password?
@@ -92,7 +92,7 @@ import { useAuthStore } from '@/components/stores/auth'
 const router = useRouter()
 const authStore = useAuthStore()
 
-// State
+//State
 const userId = ref('')
 const password = ref('')
 const showPassword = ref(false)
@@ -101,12 +101,12 @@ const serverError = ref('')
 const successMessage = ref('')
 const isLoading = ref(false)
 
-// Computed
+//Computed
 const isFormValid = computed(() => {
   return userId.value && password.value && Object.keys(errors.value).length === 0
 })
 
-// Validation
+//Validation
 const validateUserId = () => {
   if (!userId.value) {
     errors.value.userId = 'User ID is required'
@@ -146,7 +146,7 @@ const handleLogin = async () => {
   serverError.value = ''
   successMessage.value = ''
   
-  // Validate all fields
+  //Validate all fields
   const isUserIdValid = validateUserId()
   const isPasswordValid = validatePassword()
   

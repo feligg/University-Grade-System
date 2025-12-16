@@ -1,16 +1,15 @@
-// Student ID validation (assuming it should be a positive number)
 export const isValidStudentId = (studentId) => {
-  // Check if it's a number and positive
+  //Check studentID
   const id = Number(studentId)
   return !isNaN(id) && id > 0 && Number.isInteger(id)
 }
 
-// Password validation (min 6 chars for simplicity)
+//Password validation (min 6 chars for simplicity)
 export const isValidPassword = (password) => {
   return password && password.length >= 6
 }
 
-// Validate login form with student ID
+//Validate login form with student ID
 export const validateLoginForm = (studentId, password) => {
   const errors = {}
 
@@ -32,7 +31,7 @@ export const validateLoginForm = (studentId, password) => {
   }
 }
 
-// Validate registration form (if you need it later)
+//Validate registration form
 export const validateRegisterForm = (studentId, name, email, password, confirmPassword) => {
   const errors = {}
 
@@ -70,7 +69,7 @@ export const validateRegisterForm = (studentId, name, email, password, confirmPa
   }
 }
 
-// General purpose validators
+//General purpose validators
 export const validators = {
   required: (value, fieldName = 'This field') => {
     return value && value.toString().trim().length > 0

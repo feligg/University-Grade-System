@@ -53,7 +53,7 @@ const router = createRouter({
       meta: { requiresAuth: true }
     },
     {
-      path: '/admin',              // NEW
+      path: '/admin',            
       name: 'admin',
       component: AdminView,
       meta: { requiresAuth: true, requiresAdmin: true }
@@ -66,14 +66,13 @@ const router = createRouter({
   ]
 })
 
-// Navigation guard
+//Navigation guard
 router.beforeEach((to, from, next) => {
   const authStore = useAuthStore()
 
   if (to.meta.requiresAuth && !authStore.isAuthenticated) {
     next({ name: 'login', query: { redirect: to.fullPath } })
   } else if (to.meta.requiresAdmin && !authStore.isAdmin) {
-    // Redirect non-admin users trying to access admin panel
     next({ name: 'dashboard' })
   } else if ((to.name === 'login' || to.name === 'register') && authStore.isAuthenticated) {
     next({ name: 'dashboard' })

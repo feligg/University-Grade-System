@@ -4,14 +4,14 @@ import { ref, computed } from 'vue'
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000/api'
 
 export const useAuthStore = defineStore('auth', () => {
-  // State
+  //State
   const user = ref(null)
   const token = ref(null)
   const loading = ref(false)
   const error = ref(null)
-  const profile = ref(null) // Additional profile data
+  const profile = ref(null)
 
-  // Getters
+  //Getter
   const isAuthenticated = computed(() => !!token.value && !!user.value)
   const currentUser = computed(() => user.value)
   const userType = computed(() => user.value?.user_type || null)
@@ -29,7 +29,7 @@ export const useAuthStore = defineStore('auth', () => {
     return null
   })
 
-  // Helper function to handle API responses
+  //Helper function to handle API responses
   const handleResponse = async (response) => {
     const data = await response.json()
     
@@ -41,9 +41,9 @@ export const useAuthStore = defineStore('auth', () => {
     return data
   }
 
-  // Actions
+  //Actions
   const initialize = () => {
-    // Load user from localStorage on app start
+    //Load user from localStorage on app start
     try {
       const storedUser = localStorage.getItem('user')
       const storedToken = localStorage.getItem('authToken')
@@ -90,22 +90,22 @@ export const useAuthStore = defineStore('auth', () => {
       const data = await response.json()
       console.log('Login successful:', data)
 
-      // Store user and token
+      //Store user and token
       user.value = data.user
       token.value = data.token
       
-      // Persist to localStorage
+      //Persist to localStorage
       localStorage.setItem('authToken', data.token)
       localStorage.setItem('user', JSON.stringify(data.user))
 
-      // Fetch full profile based on user type
+      //Fetch full profile based on user type
       await fetchFullProfile()
 
       return { success: true, user: data.user }
     } catch (err) {
       console.error('Login error:', err)
       
-      // Provide user-friendly error messages
+      //Provide user friendly error messages
       if (err.message.includes('Failed to fetch') || err.message.includes('NetworkError')) {
         error.value = 'Cannot connect to server. Please make sure the backend is running on http://localhost:3000'
       } else if (err.message.includes('401')) {
@@ -114,7 +114,7 @@ export const useAuthStore = defineStore('auth', () => {
         error.value = err.message || 'Login failed. Please try again.'
       }
       
-      // Clear any partial state
+      //Clear any partial state
       user.value = null
       token.value = null
       profile.value = null
@@ -161,22 +161,22 @@ export const useAuthStore = defineStore('auth', () => {
       const data = await response.json()
       console.log('Registration successful:', data)
 
-      // Store user and token
+      //Store user and token
       user.value = data.user
       token.value = data.token
       
-      // Persist to localStorage
+      //Persist to localStorage
       localStorage.setItem('authToken', data.token)
       localStorage.setItem('user', JSON.stringify(data.user))
 
-      // Fetch full profile
+      //Fetch full profile
       await fetchFullProfile()
 
       return { success: true, user: data.user }
     } catch (err) {
       console.error('Registration error:', err)
       
-      // Provide user-friendly error messages
+      //Provide error messages
       if (err.message.includes('Failed to fetch') || err.message.includes('NetworkError')) {
         error.value = 'Cannot connect to server. Please make sure the backend is running on http://localhost:3000'
       } else if (err.message.includes('already exists') || err.message.includes('UNIQUE constraint') || err.message.includes('409')) {
@@ -187,7 +187,7 @@ export const useAuthStore = defineStore('auth', () => {
         error.value = err.message || 'Registration failed. Please try again.'
       }
       
-      // Clear any partial state
+      //Clear any partial state
       user.value = null
       token.value = null
       profile.value = null
@@ -204,13 +204,13 @@ export const useAuthStore = defineStore('auth', () => {
   const logout = () => {
     console.log('Logging out user')
     
-    // Clear state
+    //Clear state
     user.value = null
     token.value = null
     profile.value = null
     error.value = null
     
-    // Clear localStorage
+    //Clear localStorage
     localStorage.removeItem('authToken')
     localStorage.removeItem('user')
     localStorage.removeItem('profile')
@@ -232,7 +232,6 @@ export const useAuthStore = defineStore('auth', () => {
       } else if (user.value.user_type === 'instructor') {
         endpoint = '/instructor/profile'
       } else {
-        // Admin doesn't need additional profile
         return { success: true }
       }
 
@@ -260,7 +259,7 @@ export const useAuthStore = defineStore('auth', () => {
     }
   }
 
-  // Initialize on store creation
+  //Init on store creation
   initialize()
 
   return {

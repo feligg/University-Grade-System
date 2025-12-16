@@ -1,7 +1,6 @@
-// API Base URL - change this to your actual backend URL
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000/api'
 
-// Helper function to handle API responses
+//Helper function to handle API responses
 const handleResponse = async (response) => {
   let data
   try {
@@ -18,7 +17,7 @@ const handleResponse = async (response) => {
   return data
 }
 
-// Login user
+//Login user
 export const login = async (userId, password) => {
   try {
     console.log('Attempting login to:', `${API_URL}/auth/login`)
@@ -36,7 +35,7 @@ export const login = async (userId, password) => {
 
     const data = await handleResponse(response)
     
-    // Store token and user data
+    //Store token and user data
     if (data.token) {
       localStorage.setItem('authToken', data.token)
       localStorage.setItem('user', JSON.stringify(data.user))
@@ -49,7 +48,7 @@ export const login = async (userId, password) => {
   }
 }
 
-// Register new user
+//Register new user
 export const register = async (userData) => {
   try {
     console.log('Attempting registration to:', `${API_URL}/auth/register`)
@@ -64,7 +63,7 @@ export const register = async (userData) => {
 
     const data = await handleResponse(response)
     
-    // Auto-login after registration
+    //Auto login after registration
     if (data.token) {
       localStorage.setItem('authToken', data.token)
       localStorage.setItem('user', JSON.stringify(data.user))
@@ -77,13 +76,13 @@ export const register = async (userData) => {
   }
 }
 
-// Logout user
+//Logout user
 export const logout = () => {
   localStorage.removeItem('authToken')
   localStorage.removeItem('user')
 }
 
-// Get current user from localStorage
+//Get current user from localStorage
 export const getCurrentUser = () => {
   const userStr = localStorage.getItem('user')
   if (userStr) {
@@ -96,17 +95,17 @@ export const getCurrentUser = () => {
   return null
 }
 
-// Get auth token
+//Get auth token
 export const getAuthToken = () => {
   return localStorage.getItem('authToken')
 }
 
-// Check if user is authenticated
+//Check if user is authenticated
 export const isAuthenticated = () => {
   return !!getAuthToken()
 }
 
-// Verify token
+//Verify token
 export const verifyToken = async () => {
   const token = getAuthToken()
   
@@ -130,7 +129,7 @@ export const verifyToken = async () => {
   }
 }
 
-// Get student profile
+//Get student profile
 export const getStudentProfile = async () => {
   const token = getAuthToken()
   

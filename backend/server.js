@@ -501,8 +501,11 @@ app.get('/api/semesters/active', authenticateToken, async (req, res) => {
   }
 });
 
+// Add these routes to your server.js file
+
 // ==================== ADMIN COURSE MANAGEMENT ====================
 
+// Create new course
 app.post('/api/courses', authenticateToken, isAdmin, async (req, res) => {
   try {
     const { course_code, course_name, description, credits, dept_id, course_type } = req.body;
@@ -517,7 +520,10 @@ app.post('/api/courses', authenticateToken, isAdmin, async (req, res) => {
       [course_code, course_name, description, credits, dept_id, course_type]
     );
 
-    res.status(201).json({ message: 'Course created successfully', course_id: result.lastID });
+    res.status(201).json({ 
+      message: 'Course created successfully',
+      course_id: result.lastID 
+    });
   } catch (error) {
     console.error('Course creation error:', error);
     if (error.message.includes('UNIQUE constraint')) {
@@ -527,6 +533,7 @@ app.post('/api/courses', authenticateToken, isAdmin, async (req, res) => {
   }
 });
 
+// Update course
 app.put('/api/courses/:id', authenticateToken, isAdmin, async (req, res) => {
   try {
     const { id } = req.params;
@@ -546,10 +553,13 @@ app.put('/api/courses/:id', authenticateToken, isAdmin, async (req, res) => {
   }
 });
 
+// Delete course
 app.delete('/api/courses/:id', authenticateToken, isAdmin, async (req, res) => {
   try {
     const { id } = req.params;
+
     await runQuery('DELETE FROM courses WHERE id = ?', [id]);
+
     res.json({ message: 'Course deleted successfully' });
   } catch (error) {
     console.error('Course deletion error:', error);
@@ -559,17 +569,20 @@ app.delete('/api/courses/:id', authenticateToken, isAdmin, async (req, res) => {
 
 // ==================== ADMIN STUDENT MANAGEMENT ====================
 
+// Update student
 app.put('/api/students/:id', authenticateToken, isAdmin, async (req, res) => {
   try {
     const { id } = req.params;
     const { name, email, major, college, year_of_study, gender, contact_phone } = req.body;
 
+    // Get the student record to find user_id
     const student = await getQuery('SELECT user_id FROM students WHERE id = ?', [id]);
     
     if (!student) {
       return res.status(404).json({ message: 'Student not found' });
     }
 
+    // Update users table
     await runQuery(
       `UPDATE users 
        SET name = ?, email = ?, gender = ?, contact_phone = ?, updated_at = CURRENT_TIMESTAMP
@@ -577,6 +590,7 @@ app.put('/api/students/:id', authenticateToken, isAdmin, async (req, res) => {
       [name, email, gender, contact_phone, student.user_id]
     );
 
+    // Update students table
     await runQuery(
       `UPDATE students 
        SET major = ?, college = ?, year_of_study = ?
@@ -596,17 +610,20 @@ app.put('/api/students/:id', authenticateToken, isAdmin, async (req, res) => {
 
 // ==================== ADMIN INSTRUCTOR MANAGEMENT ====================
 
+// Update instructor
 app.put('/api/instructors/:id', authenticateToken, isAdmin, async (req, res) => {
   try {
     const { id } = req.params;
     const { name, email, dept_id, title, office_location, office_hours, contact_phone } = req.body;
 
+    // Get the instructor record to find user_id
     const instructor = await getQuery('SELECT user_id FROM instructors WHERE id = ?', [id]);
     
     if (!instructor) {
       return res.status(404).json({ message: 'Instructor not found' });
     }
 
+    // Update users table
     await runQuery(
       `UPDATE users 
        SET name = ?, email = ?, contact_phone = ?, updated_at = CURRENT_TIMESTAMP
@@ -614,6 +631,7 @@ app.put('/api/instructors/:id', authenticateToken, isAdmin, async (req, res) => 
       [name, email, contact_phone, instructor.user_id]
     );
 
+    // Update instructors table
     await runQuery(
       `UPDATE instructors 
        SET dept_id = ?, title = ?, office_location = ?, office_hours = ?

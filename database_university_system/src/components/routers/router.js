@@ -52,12 +52,12 @@ const router = createRouter({
       component: FacultyView,
       meta: { requiresAuth: true }
     },
-   {
-  path: '/admin',
-  name: 'admin',
-  component: AdminView,
-  meta: { requiresAuth: true }
-},
+    {
+      path: '/admin',              // NEW
+      name: 'admin',
+      component: AdminView,
+      meta: { requiresAuth: true, requiresAdmin: true }
+    },
     {
       path: '/:pathMatch(.*)*',
       name: 'NotFound',

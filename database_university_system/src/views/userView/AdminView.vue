@@ -1,12 +1,12 @@
 <template>
-  <div class="admin-panel">
-    <div class="admin-header">
-      <h1>👨‍💼 Admin Panel</h1>
+  <div class="admin-page">
+    <div class="page-header">
+      <h1>👨‍💼 Admin Dashboard</h1>
       <p class="subtitle">Manage courses, students, and instructors</p>
     </div>
 
     <!-- Tab Navigation -->
-    <div class="tab-nav">
+    <div class="tabs">
       <button 
         @click="activeTab = 'courses'" 
         :class="['tab-btn', { active: activeTab === 'courses' }]"
@@ -29,18 +29,20 @@
 
     <!-- Courses Tab -->
     <div v-if="activeTab === 'courses'" class="tab-content">
-      <div class="content-header">
+      <div class="action-bar">
         <h2>Course Management</h2>
         <button @click="openCourseModal()" class="btn-create">
-          + Create New Course
+          ➕ Create New Course
         </button>
       </div>
 
-      <!-- Courses List -->
-      <div v-if="loading" class="loading">Loading...</div>
-      <div v-else-if="error" class="error">{{ error }}</div>
-      <div v-else class="data-table">
-        <table>
+      <div v-if="loading" class="loading-container">
+        <div class="spinner"></div>
+        <p>Loading courses...</p>
+      </div>
+
+      <div v-else class="table-wrapper">
+        <table class="data-table">
           <thead>
             <tr>
               <th>Code</th>
@@ -53,14 +55,22 @@
           </thead>
           <tbody>
             <tr v-for="course in courses" :key="course.id">
-              <td><strong>{{ course.course_code }}</strong></td>
+              <td class="course-code">{{ course.course_code }}</td>
               <td>{{ course.course_name }}</td>
               <td>{{ course.credits }}</td>
               <td>{{ course.dept_name }}</td>
-              <td><span class="type-badge" :class="course.course_type">{{ formatType(course.course_type) }}</span></td>
-              <td class="actions">
-                <button @click="openCourseModal(course)" class="btn-edit">✏️ Edit</button>
-                <button @click="deleteCourse(course)" class="btn-delete">🗑️ Delete</button>
+              <td>
+                <span class="type-badge" :class="course.course_type">
+                  {{ formatCourseType(course.course_type) }}
+                </span>
+              </td>
+              <td class="actions-cell">
+                <button @click="openCourseModal(course)" class="btn-action btn-edit">
+                  ✏️ Edit
+                </button>
+                <button @click="deleteCourse(course)" class="btn-action btn-delete">
+                  🗑️ Delete
+                </button>
               </td>
             </tr>
           </tbody>
@@ -70,17 +80,20 @@
 
     <!-- Students Tab -->
     <div v-if="activeTab === 'students'" class="tab-content">
-      <div class="content-header">
+      <div class="action-bar">
         <h2>Student Management</h2>
       </div>
 
-      <div v-if="loading" class="loading">Loading...</div>
-      <div v-else-if="error" class="error">{{ error }}</div>
-      <div v-else class="data-table">
-        <table>
+      <div v-if="loading" class="loading-container">
+        <div class="spinner"></div>
+        <p>Loading students...</p>
+      </div>
+
+      <div v-else class="table-wrapper">
+        <table class="data-table">
           <thead>
             <tr>
-              <th>ID</th>
+              <th>Student ID</th>
               <th>Name</th>
               <th>Email</th>
               <th>Major</th>
@@ -90,13 +103,15 @@
           </thead>
           <tbody>
             <tr v-for="student in students" :key="student.id">
-              <td><strong>{{ student.student_id }}</strong></td>
+              <td class="student-id">{{ student.student_id }}</td>
               <td>{{ student.name }}</td>
               <td>{{ student.email }}</td>
               <td>{{ student.major }}</td>
-              <td>{{ student.year_of_study }}</td>
-              <td class="actions">
-                <button @click="openStudentModal(student)" class="btn-edit">✏️ Edit</button>
+              <td>Year {{ student.year_of_study }}</td>
+              <td class="actions-cell">
+                <button @click="openStudentModal(student)" class="btn-action btn-edit">
+                  ✏️ Edit
+                </button>
               </td>
             </tr>
           </tbody>
@@ -106,17 +121,20 @@
 
     <!-- Instructors Tab -->
     <div v-if="activeTab === 'instructors'" class="tab-content">
-      <div class="content-header">
+      <div class="action-bar">
         <h2>Instructor Management</h2>
       </div>
 
-      <div v-if="loading" class="loading">Loading...</div>
-      <div v-else-if="error" class="error">{{ error }}</div>
-      <div v-else class="data-table">
-        <table>
+      <div v-if="loading" class="loading-container">
+        <div class="spinner"></div>
+        <p>Loading instructors...</p>
+      </div>
+
+      <div v-else class="table-wrapper">
+        <table class="data-table">
           <thead>
             <tr>
-              <th>ID</th>
+              <th>Instructor ID</th>
               <th>Name</th>
               <th>Email</th>
               <th>Department</th>
@@ -126,13 +144,15 @@
           </thead>
           <tbody>
             <tr v-for="instructor in instructors" :key="instructor.id">
-              <td><strong>{{ instructor.instructor_id }}</strong></td>
+              <td class="instructor-id">{{ instructor.instructor_id }}</td>
               <td>{{ instructor.name }}</td>
               <td>{{ instructor.email }}</td>
               <td>{{ instructor.dept_name }}</td>
               <td>{{ instructor.title }}</td>
-              <td class="actions">
-                <button @click="openInstructorModal(instructor)" class="btn-edit">✏️ Edit</button>
+              <td class="actions-cell">
+                <button @click="openInstructorModal(instructor)" class="btn-action btn-edit">
+                  ✏️ Edit
+                </button>
               </td>
             </tr>
           </tbody>
@@ -148,48 +168,84 @@
           <button @click="closeCourseModal" class="btn-close">×</button>
         </div>
         <div class="modal-body">
-          <form @submit.prevent="saveCourse">
-            <div class="form-group">
-              <label>Course Code *</label>
-              <input v-model="courseForm.course_code" :disabled="editingCourse" required />
-            </div>
-            <div class="form-group">
-              <label>Course Name *</label>
-              <input v-model="courseForm.course_name" required />
-            </div>
-            <div class="form-group">
-              <label>Description</label>
-              <textarea v-model="courseForm.description" rows="3"></textarea>
-            </div>
+          <form @submit.prevent="saveCourse" class="form">
             <div class="form-row">
               <div class="form-group">
-                <label>Credits *</label>
-                <input v-model.number="courseForm.credits" type="number" min="1" max="10" required />
+                <label>Course Code *</label>
+                <input 
+                  v-model="courseForm.course_code" 
+                  type="text" 
+                  placeholder="e.g., CS101"
+                  required
+                  :disabled="editingCourse"
+                />
               </div>
+              <div class="form-group">
+                <label>Credits *</label>
+                <input 
+                  v-model.number="courseForm.credits" 
+                  type="number" 
+                  min="1" 
+                  max="10"
+                  required
+                />
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label>Course Name *</label>
+              <input 
+                v-model="courseForm.course_name" 
+                type="text" 
+                placeholder="e.g., Introduction to Programming"
+                required
+              />
+            </div>
+
+            <div class="form-group">
+              <label>Description</label>
+              <textarea 
+                v-model="courseForm.description" 
+                rows="3"
+                placeholder="Course description..."
+              ></textarea>
+            </div>
+
+            <div class="form-row">
               <div class="form-group">
                 <label>Department *</label>
                 <select v-model.number="courseForm.dept_id" required>
-                  <option value="">Select...</option>
+                  <option value="">Select Department</option>
                   <option v-for="dept in departments" :key="dept.id" :value="dept.id">
                     {{ dept.dept_name }}
                   </option>
                 </select>
               </div>
+
+              <div class="form-group">
+                <label>Course Type *</label>
+                <select v-model="courseForm.course_type" required>
+                  <option value="">Select Type</option>
+                  <option value="general_required">General Required</option>
+                  <option value="major_required">Major Required</option>
+                  <option value="major_elective">Major Elective</option>
+                  <option value="university_elective">University Elective</option>
+                  <option value="practical">Practical</option>
+                </select>
+              </div>
             </div>
-            <div class="form-group">
-              <label>Course Type *</label>
-              <select v-model="courseForm.course_type" required>
-                <option value="">Select...</option>
-                <option value="general_required">General Required</option>
-                <option value="major_required">Major Required</option>
-                <option value="major_elective">Major Elective</option>
-                <option value="university_elective">University Elective</option>
-                <option value="practical">Practical</option>
-              </select>
+
+            <div v-if="saveError" class="alert alert-error">
+              {{ saveError }}
             </div>
-            <div class="modal-actions">
-              <button type="button" @click="closeCourseModal" class="btn-cancel">Cancel</button>
-              <button type="submit" class="btn-save">{{ editingCourse ? 'Save Changes' : 'Create Course' }}</button>
+
+            <div class="form-actions">
+              <button type="button" @click="closeCourseModal" class="btn-cancel">
+                Cancel
+              </button>
+              <button type="submit" class="btn-save" :disabled="saving">
+                {{ saving ? 'Saving...' : (editingCourse ? 'Update Course' : 'Create Course') }}
+              </button>
             </div>
           </form>
         </div>
@@ -200,61 +256,84 @@
     <div v-if="showStudentModal" class="modal-overlay" @click="closeStudentModal">
       <div class="modal-content" @click.stop>
         <div class="modal-header">
-          <h2>Edit Student</h2>
+          <h2>Edit Student Information</h2>
           <button @click="closeStudentModal" class="btn-close">×</button>
         </div>
         <div class="modal-body">
-          <form @submit.prevent="saveStudent">
+          <form @submit.prevent="saveStudent" class="form">
             <div class="form-group">
               <label>Student ID</label>
-              <input v-model="studentForm.student_id" disabled />
+              <input v-model="studentForm.student_id" type="text" disabled class="disabled-input" />
             </div>
+
             <div class="form-group">
               <label>Name *</label>
-              <input v-model="studentForm.name" required />
+              <input v-model="studentForm.name" type="text" required />
             </div>
+
             <div class="form-group">
               <label>Email *</label>
               <input v-model="studentForm.email" type="email" required />
             </div>
+
             <div class="form-row">
               <div class="form-group">
                 <label>Major</label>
-                <input v-model="studentForm.major" />
+                <select v-model="studentForm.major">
+                  <option value="">Select Major</option>
+                  <option value="Computer Science">Computer Science</option>
+                  <option value="Electrical Engineering">Electrical Engineering</option>
+                  <option value="Mechanical Engineering">Mechanical Engineering</option>
+                  <option value="Mathematics">Mathematics</option>
+                  <option value="Physics">Physics</option>
+                </select>
               </div>
+
               <div class="form-group">
                 <label>College</label>
-                <input v-model="studentForm.college" />
+                <input v-model="studentForm.college" type="text" />
               </div>
             </div>
+
             <div class="form-row">
               <div class="form-group">
                 <label>Year of Study</label>
                 <select v-model.number="studentForm.year_of_study">
-                  <option value="1">1st Year</option>
-                  <option value="2">2nd Year</option>
-                  <option value="3">3rd Year</option>
-                  <option value="4">4th Year</option>
-                  <option value="5">5th Year</option>
+                  <option :value="1">1st Year</option>
+                  <option :value="2">2nd Year</option>
+                  <option :value="3">3rd Year</option>
+                  <option :value="4">4th Year</option>
+                  <option :value="5">5th Year</option>
                 </select>
               </div>
+
               <div class="form-group">
                 <label>Gender</label>
                 <select v-model="studentForm.gender">
-                  <option value="">Select...</option>
+                  <option value="">Select Gender</option>
                   <option value="Male">Male</option>
                   <option value="Female">Female</option>
                   <option value="Other">Other</option>
                 </select>
               </div>
             </div>
+
             <div class="form-group">
               <label>Contact Phone</label>
               <input v-model="studentForm.contact_phone" type="tel" />
             </div>
-            <div class="modal-actions">
-              <button type="button" @click="closeStudentModal" class="btn-cancel">Cancel</button>
-              <button type="submit" class="btn-save">Save Changes</button>
+
+            <div v-if="saveError" class="alert alert-error">
+              {{ saveError }}
+            </div>
+
+            <div class="form-actions">
+              <button type="button" @click="closeStudentModal" class="btn-cancel">
+                Cancel
+              </button>
+              <button type="submit" class="btn-save" :disabled="saving">
+                {{ saving ? 'Saving...' : 'Update Student' }}
+              </button>
             </div>
           </form>
         </div>
@@ -265,53 +344,76 @@
     <div v-if="showInstructorModal" class="modal-overlay" @click="closeInstructorModal">
       <div class="modal-content" @click.stop>
         <div class="modal-header">
-          <h2>Edit Instructor</h2>
+          <h2>Edit Instructor Information</h2>
           <button @click="closeInstructorModal" class="btn-close">×</button>
         </div>
         <div class="modal-body">
-          <form @submit.prevent="saveInstructor">
+          <form @submit.prevent="saveInstructor" class="form">
             <div class="form-group">
               <label>Instructor ID</label>
-              <input v-model="instructorForm.instructor_id" disabled />
+              <input v-model="instructorForm.instructor_id" type="text" disabled class="disabled-input" />
             </div>
+
             <div class="form-group">
               <label>Name *</label>
-              <input v-model="instructorForm.name" required />
+              <input v-model="instructorForm.name" type="text" required />
             </div>
+
             <div class="form-group">
               <label>Email *</label>
               <input v-model="instructorForm.email" type="email" required />
             </div>
+
             <div class="form-row">
               <div class="form-group">
                 <label>Department *</label>
                 <select v-model.number="instructorForm.dept_id" required>
-                  <option value="">Select...</option>
+                  <option value="">Select Department</option>
                   <option v-for="dept in departments" :key="dept.id" :value="dept.id">
                     {{ dept.dept_name }}
                   </option>
                 </select>
               </div>
+
               <div class="form-group">
                 <label>Title</label>
-                <input v-model="instructorForm.title" />
+                <select v-model="instructorForm.title">
+                  <option value="">Select Title</option>
+                  <option value="Professor">Professor</option>
+                  <option value="Associate Professor">Associate Professor</option>
+                  <option value="Assistant Professor">Assistant Professor</option>
+                  <option value="Lecturer">Lecturer</option>
+                  <option value="Teaching Assistant">Teaching Assistant</option>
+                </select>
               </div>
             </div>
+
             <div class="form-group">
               <label>Office Location</label>
-              <input v-model="instructorForm.office_location" />
+              <input v-model="instructorForm.office_location" type="text" placeholder="e.g., Building A, Room 301" />
             </div>
+
             <div class="form-group">
               <label>Office Hours</label>
-              <input v-model="instructorForm.office_hours" />
+              <input v-model="instructorForm.office_hours" type="text" placeholder="e.g., Mon-Wed 2-4 PM" />
             </div>
+
             <div class="form-group">
               <label>Contact Phone</label>
               <input v-model="instructorForm.contact_phone" type="tel" />
             </div>
-            <div class="modal-actions">
-              <button type="button" @click="closeInstructorModal" class="btn-cancel">Cancel</button>
-              <button type="submit" class="btn-save">Save Changes</button>
+
+            <div v-if="saveError" class="alert alert-error">
+              {{ saveError }}
+            </div>
+
+            <div class="form-actions">
+              <button type="button" @click="closeInstructorModal" class="btn-cancel">
+                Cancel
+              </button>
+              <button type="submit" class="btn-save" :disabled="saving">
+                {{ saving ? 'Saving...' : 'Update Instructor' }}
+              </button>
             </div>
           </form>
         </div>
@@ -323,34 +425,28 @@
 <script setup>
 import { ref, onMounted, watch } from 'vue';
 import { useAuthStore } from '@/components/stores/auth';
-import { useRouter } from 'vue-router';
 
 const authStore = useAuthStore();
-const router = useRouter();
-
-// Check if user is admin
-if (!authStore.isAdmin) {
-  router.push('/dashboard');
-}
 
 // State
 const activeTab = ref('courses');
 const loading = ref(false);
-const error = ref(null);
+const saving = ref(false);
+const saveError = ref(null);
 
-// Data
 const courses = ref([]);
 const students = ref([]);
 const instructors = ref([]);
 const departments = ref([]);
 
-// Modals
 const showCourseModal = ref(false);
 const showStudentModal = ref(false);
 const showInstructorModal = ref(false);
 
-// Forms
 const editingCourse = ref(null);
+const editingStudent = ref(null);
+const editingInstructor = ref(null);
+
 const courseForm = ref({
   course_code: '',
   course_name: '',
@@ -360,44 +456,93 @@ const courseForm = ref({
   course_type: ''
 });
 
-const studentForm = ref({});
-const instructorForm = ref({});
+const studentForm = ref({
+  id: null,
+  student_id: '',
+  name: '',
+  email: '',
+  major: '',
+  college: '',
+  year_of_study: 1,
+  gender: '',
+  contact_phone: ''
+});
+
+const instructorForm = ref({
+  id: null,
+  instructor_id: '',
+  name: '',
+  email: '',
+  dept_id: '',
+  title: '',
+  office_location: '',
+  office_hours: '',
+  contact_phone: ''
+});
 
 // Methods
-const loadData = async () => {
+const fetchCourses = async () => {
   loading.value = true;
-  error.value = null;
-  
   try {
-    if (activeTab.value === 'courses') {
-      const res = await fetch('http://localhost:3000/api/courses', {
-        headers: { 'Authorization': `Bearer ${authStore.token}` }
-      });
-      courses.value = await res.json();
-    } else if (activeTab.value === 'students') {
-      const res = await fetch('http://localhost:3000/api/students', {
-        headers: { 'Authorization': `Bearer ${authStore.token}` }
-      });
-      students.value = await res.json();
-    } else if (activeTab.value === 'instructors') {
-      const res = await fetch('http://localhost:3000/api/instructors', {
-        headers: { 'Authorization': `Bearer ${authStore.token}` }
-      });
-      instructors.value = await res.json();
+    const response = await fetch('http://localhost:3000/api/courses', {
+      headers: {
+        'Authorization': `Bearer ${authStore.token}`
+      }
+    });
+    if (response.ok) {
+      courses.value = await response.json();
     }
   } catch (err) {
-    error.value = 'Failed to load data';
+    console.error('Failed to fetch courses:', err);
   } finally {
     loading.value = false;
   }
 };
 
-const loadDepartments = async () => {
+const fetchStudents = async () => {
+  loading.value = true;
   try {
-    const res = await fetch('http://localhost:3000/api/departments');
-    departments.value = await res.json();
+    const response = await fetch('http://localhost:3000/api/students', {
+      headers: {
+        'Authorization': `Bearer ${authStore.token}`
+      }
+    });
+    if (response.ok) {
+      students.value = await response.json();
+    }
   } catch (err) {
-    console.error('Failed to load departments:', err);
+    console.error('Failed to fetch students:', err);
+  } finally {
+    loading.value = false;
+  }
+};
+
+const fetchInstructors = async () => {
+  loading.value = true;
+  try {
+    const response = await fetch('http://localhost:3000/api/instructors', {
+      headers: {
+        'Authorization': `Bearer ${authStore.token}`
+      }
+    });
+    if (response.ok) {
+      instructors.value = await response.json();
+    }
+  } catch (err) {
+    console.error('Failed to fetch instructors:', err);
+  } finally {
+    loading.value = false;
+  }
+};
+
+const fetchDepartments = async () => {
+  try {
+    const response = await fetch('http://localhost:3000/api/departments');
+    if (response.ok) {
+      departments.value = await response.json();
+    }
+  } catch (err) {
+    console.error('Failed to fetch departments:', err);
   }
 };
 
@@ -416,6 +561,7 @@ const openCourseModal = (course = null) => {
     };
   }
   showCourseModal.value = true;
+  saveError.value = null;
 };
 
 const closeCourseModal = () => {
@@ -424,14 +570,17 @@ const closeCourseModal = () => {
 };
 
 const saveCourse = async () => {
+  saving.value = true;
+  saveError.value = null;
+
   try {
     const url = editingCourse.value 
       ? `http://localhost:3000/api/courses/${editingCourse.value.id}`
       : 'http://localhost:3000/api/courses';
     
     const method = editingCourse.value ? 'PUT' : 'POST';
-    
-    const res = await fetch(url, {
+
+    const response = await fetch(url, {
       method,
       headers: {
         'Authorization': `Bearer ${authStore.token}`,
@@ -439,52 +588,65 @@ const saveCourse = async () => {
       },
       body: JSON.stringify(courseForm.value)
     });
-    
-    if (res.ok) {
-      alert(editingCourse.value ? 'Course updated!' : 'Course created!');
+
+    if (response.ok) {
+      alert(editingCourse.value ? 'Course updated successfully!' : 'Course created successfully!');
       closeCourseModal();
-      loadData();
+      await fetchCourses();
     } else {
-      const data = await res.json();
-      alert(data.message || 'Failed to save course');
+      const data = await response.json();
+      saveError.value = data.message || 'Failed to save course';
     }
   } catch (err) {
-    alert('Error saving course');
+    saveError.value = 'Error: ' + err.message;
+  } finally {
+    saving.value = false;
   }
 };
 
 const deleteCourse = async (course) => {
-  if (!confirm(`Delete course ${course.course_code}?`)) return;
-  
+  if (!confirm(`Are you sure you want to delete ${course.course_name}?`)) {
+    return;
+  }
+
   try {
-    const res = await fetch(`http://localhost:3000/api/courses/${course.id}`, {
+    const response = await fetch(`http://localhost:3000/api/courses/${course.id}`, {
       method: 'DELETE',
-      headers: { 'Authorization': `Bearer ${authStore.token}` }
+      headers: {
+        'Authorization': `Bearer ${authStore.token}`
+      }
     });
-    
-    if (res.ok) {
-      alert('Course deleted!');
-      loadData();
+
+    if (response.ok) {
+      alert('Course deleted successfully!');
+      await fetchCourses();
     } else {
-      alert('Failed to delete course');
+      const data = await response.json();
+      alert(data.message || 'Failed to delete course');
     }
   } catch (err) {
-    alert('Error deleting course');
+    alert('Error: ' + err.message);
   }
 };
 
 const openStudentModal = (student) => {
+  editingStudent.value = student;
   studentForm.value = { ...student };
   showStudentModal.value = true;
+  saveError.value = null;
 };
 
 const closeStudentModal = () => {
   showStudentModal.value = false;
+  editingStudent.value = null;
 };
 
 const saveStudent = async () => {
+  saving.value = true;
+  saveError.value = null;
+
   try {
-    const res = await fetch(`http://localhost:3000/api/students/${studentForm.value.id}`, {
+    const response = await fetch(`http://localhost:3000/api/students/${studentForm.value.id}`, {
       method: 'PUT',
       headers: {
         'Authorization': `Bearer ${authStore.token}`,
@@ -492,32 +654,40 @@ const saveStudent = async () => {
       },
       body: JSON.stringify(studentForm.value)
     });
-    
-    if (res.ok) {
-      alert('Student updated!');
+
+    if (response.ok) {
+      alert('Student updated successfully!');
       closeStudentModal();
-      loadData();
+      await fetchStudents();
     } else {
-      const data = await res.json();
-      alert(data.message || 'Failed to update student');
+      const data = await response.json();
+      saveError.value = data.message || 'Failed to update student';
     }
   } catch (err) {
-    alert('Error updating student');
+    saveError.value = 'Error: ' + err.message;
+  } finally {
+    saving.value = false;
   }
 };
 
 const openInstructorModal = (instructor) => {
+  editingInstructor.value = instructor;
   instructorForm.value = { ...instructor };
   showInstructorModal.value = true;
+  saveError.value = null;
 };
 
 const closeInstructorModal = () => {
   showInstructorModal.value = false;
+  editingInstructor.value = null;
 };
 
 const saveInstructor = async () => {
+  saving.value = true;
+  saveError.value = null;
+
   try {
-    const res = await fetch(`http://localhost:3000/api/instructors/${instructorForm.value.id}`, {
+    const response = await fetch(`http://localhost:3000/api/instructors/${instructorForm.value.id}`, {
       method: 'PUT',
       headers: {
         'Authorization': `Bearer ${authStore.token}`,
@@ -525,21 +695,23 @@ const saveInstructor = async () => {
       },
       body: JSON.stringify(instructorForm.value)
     });
-    
-    if (res.ok) {
-      alert('Instructor updated!');
+
+    if (response.ok) {
+      alert('Instructor updated successfully!');
       closeInstructorModal();
-      loadData();
+      await fetchInstructors();
     } else {
-      const data = await res.json();
-      alert(data.message || 'Failed to update instructor');
+      const data = await response.json();
+      saveError.value = data.message || 'Failed to update instructor';
     }
   } catch (err) {
-    alert('Error updating instructor');
+    saveError.value = 'Error: ' + err.message;
+  } finally {
+    saving.value = false;
   }
 };
 
-const formatType = (type) => {
+const formatCourseType = (type) => {
   const types = {
     'general_required': 'General Required',
     'major_required': 'Major Required',
@@ -551,41 +723,47 @@ const formatType = (type) => {
 };
 
 // Watch tab changes
-watch(activeTab, () => {
-  loadData();
+watch(activeTab, (newTab) => {
+  if (newTab === 'courses') {
+    fetchCourses();
+  } else if (newTab === 'students') {
+    fetchStudents();
+  } else if (newTab === 'instructors') {
+    fetchInstructors();
+  }
 });
 
-// Load initial data
+// Lifecycle
 onMounted(() => {
-  loadDepartments();
-  loadData();
+  fetchCourses();
+  fetchDepartments();
 });
 </script>
 
 <style scoped>
-.admin-panel {
+.admin-page {
   max-width: 1400px;
   margin: 0 auto;
   padding: 2rem;
 }
 
-.admin-header {
-  text-align: center;
+.page-header {
   margin-bottom: 2rem;
+  text-align: center;
 }
 
-.admin-header h1 {
+.page-header h1 {
   font-size: 2.5rem;
   color: #1f2937;
   margin-bottom: 0.5rem;
 }
 
 .subtitle {
-  color: #6b7280;
   font-size: 1.1rem;
+  color: #6b7280;
 }
 
-.tab-nav {
+.tabs {
   display: flex;
   gap: 0.5rem;
   margin-bottom: 2rem;
@@ -598,14 +776,14 @@ onMounted(() => {
 .tab-btn {
   flex: 1;
   padding: 1rem;
-  background: transparent;
   border: none;
+  background: transparent;
   border-radius: 8px;
-  font-size: 1rem;
   font-weight: 600;
+  font-size: 1rem;
+  color: #6b7280;
   cursor: pointer;
   transition: all 0.2s;
-  color: #6b7280;
 }
 
 .tab-btn:hover {
@@ -613,27 +791,29 @@ onMounted(() => {
 }
 
 .tab-btn.active {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: #667eea;
   color: white;
 }
 
 .tab-content {
   background: white;
   border-radius: 12px;
-  padding: 2rem;
   box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  overflow: hidden;
 }
 
-.content-header {
+.action-bar {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 2rem;
+  padding: 1.5rem;
+  border-bottom: 1px solid #e5e7eb;
 }
 
-.content-header h2 {
-  color: #1f2937;
-  font-size: 1.8rem;
+.action-bar h2 {
+  color: #374151;
+  font-size: 1.5rem;
+  margin: 0;
 }
 
 .btn-create {
@@ -641,7 +821,7 @@ onMounted(() => {
   background: #10b981;
   color: white;
   border: none;
-  border-radius: 6px;
+  border-radius: 8px;
   font-weight: 600;
   cursor: pointer;
   transition: all 0.2s;
@@ -652,20 +832,40 @@ onMounted(() => {
   transform: translateY(-1px);
 }
 
-.data-table {
+.loading-container {
+  text-align: center;
+  padding: 3rem;
+}
+
+.spinner {
+  border: 4px solid #f3f4f6;
+  border-top: 4px solid #667eea;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  animation: spin 1s linear infinite;
+  margin: 0 auto 1rem;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.table-wrapper {
   overflow-x: auto;
 }
 
-table {
+.data-table {
   width: 100%;
   border-collapse: collapse;
 }
 
-thead {
+.data-table thead {
   background: #f9fafb;
 }
 
-th {
+.data-table th {
   padding: 1rem;
   text-align: left;
   font-weight: 600;
@@ -673,21 +873,30 @@ th {
   border-bottom: 2px solid #e5e7eb;
 }
 
-td {
+.data-table td {
   padding: 1rem;
   border-bottom: 1px solid #e5e7eb;
   color: #4b5563;
 }
 
-tbody tr:hover {
+.data-table tbody tr:hover {
   background: #f9fafb;
 }
 
+.course-code,
+.student-id,
+.instructor-id {
+  font-weight: 600;
+  color: #667eea;
+}
+
 .type-badge {
-  padding: 0.25rem 0.75rem;
+  padding: 0.3rem 0.7rem;
   border-radius: 12px;
   font-size: 0.85rem;
   font-weight: 600;
+  background: #f3f4f6;
+  color: #4b5563;
 }
 
 .type-badge.general_required { background: #dbeafe; color: #1e40af; }
@@ -696,18 +905,19 @@ tbody tr:hover {
 .type-badge.university_elective { background: #d1fae5; color: #065f46; }
 .type-badge.practical { background: #e9d5ff; color: #6b21a8; }
 
-.actions {
+.actions-cell {
   display: flex;
   gap: 0.5rem;
 }
 
-.btn-edit, .btn-delete {
+.btn-action {
   padding: 0.5rem 1rem;
   border: none;
   border-radius: 6px;
   font-weight: 600;
   cursor: pointer;
   transition: all 0.2s;
+  font-size: 0.9rem;
 }
 
 .btn-edit {
@@ -728,16 +938,6 @@ tbody tr:hover {
   background: #fecaca;
 }
 
-.loading, .error {
-  text-align: center;
-  padding: 3rem;
-  color: #6b7280;
-}
-
-.error {
-  color: #ef4444;
-}
-
 .modal-overlay {
   position: fixed;
   top: 0;
@@ -755,7 +955,7 @@ tbody tr:hover {
 .modal-content {
   background: white;
   border-radius: 12px;
-  max-width: 600px;
+  max-width: 700px;
   width: 100%;
   max-height: 90vh;
   overflow-y: auto;
@@ -772,6 +972,7 @@ tbody tr:hover {
 .modal-header h2 {
   color: #1f2937;
   font-size: 1.5rem;
+  margin: 0;
 }
 
 .btn-close {
@@ -787,8 +988,10 @@ tbody tr:hover {
   padding: 1.5rem;
 }
 
-.form-group {
-  margin-bottom: 1.25rem;
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
 }
 
 .form-row {
@@ -797,21 +1000,26 @@ tbody tr:hover {
   gap: 1rem;
 }
 
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
 .form-group label {
-  display: block;
-  margin-bottom: 0.5rem;
   font-weight: 600;
   color: #374151;
+  font-size: 0.9rem;
 }
 
 .form-group input,
 .form-group select,
 .form-group textarea {
-  width: 100%;
   padding: 0.75rem;
   border: 2px solid #e5e7eb;
   border-radius: 6px;
   font-size: 1rem;
+  transition: border-color 0.2s;
 }
 
 .form-group input:focus,
@@ -821,22 +1029,40 @@ tbody tr:hover {
   border-color: #667eea;
 }
 
-.form-group input:disabled {
+.disabled-input {
   background: #f3f4f6;
   cursor: not-allowed;
 }
 
-.modal-actions {
+.form-group textarea {
+  resize: vertical;
+  font-family: inherit;
+}
+
+.alert {
+  padding: 1rem;
+  border-radius: 8px;
+  margin-top: 1rem;
+}
+
+.alert-error {
+  background: #fee2e2;
+  border: 1px solid #fecaca;
+  color: #991b1b;
+}
+
+.form-actions {
   display: flex;
   gap: 1rem;
-  margin-top: 2rem;
+  justify-content: flex-end;
+  margin-top: 1rem;
   padding-top: 1rem;
   border-top: 1px solid #e5e7eb;
 }
 
-.btn-cancel, .btn-save {
-  flex: 1;
-  padding: 0.75rem;
+.btn-cancel,
+.btn-save {
+  padding: 0.75rem 1.5rem;
   border: none;
   border-radius: 6px;
   font-weight: 600;
@@ -858,21 +1084,36 @@ tbody tr:hover {
   color: white;
 }
 
-.btn-save:hover {
+.btn-save:hover:not(:disabled) {
   background: #5568d3;
 }
 
+.btn-save:disabled {
+  background: #9ca3af;
+  cursor: not-allowed;
+}
+
 @media (max-width: 768px) {
-  .admin-panel {
+  .admin-page {
     padding: 1rem;
   }
-
+  
   .form-row {
     grid-template-columns: 1fr;
   }
-
-  .actions {
+  
+  .tabs {
     flex-direction: column;
+  }
+  
+  .action-bar {
+    flex-direction: column;
+    gap: 1rem;
+    align-items: stretch;
+  }
+  
+  .btn-create {
+    width: 100%;
   }
 }
 </style>

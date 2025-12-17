@@ -1,0 +1,174 @@
+@startuml University_Management_System_ERD
+
+' Entity styling
+skinparam class {
+    BackgroundColor White
+    BorderColor Black
+    ArrowColor Black
+}
+
+' USERS Entity
+entity "USERS" as users {
+    * id : INTEGER <<PK>>
+    --
+    * user_id : TEXT <<UNIQUE>>
+    * name : TEXT
+    * email : TEXT <<UNIQUE>>
+    * password_hash : TEXT
+    * user_type : TEXT
+    gender : TEXT
+    date_of_birth : DATE
+    contact_phone : TEXT
+    contact_address : TEXT
+    * is_approved : INTEGER
+    created_at : DATETIME
+    updated_at : DATETIME
+}
+
+' STUDENTS Entity
+entity "STUDENTS" as students {
+    * id : INTEGER <<PK>>
+    --
+    * user_id : INTEGER <<FK>> <<UNIQUE>>
+    * student_id : TEXT <<UNIQUE>>
+    college : TEXT
+    major : TEXT
+    year_of_study : INTEGER
+    enrollment_year : INTEGER
+}
+
+' INSTRUCTORS Entity
+entity "INSTRUCTORS" as instructors {
+    * id : INTEGER <<PK>>
+    --
+    * user_id : INTEGER <<FK>> <<UNIQUE>>
+    * instructor_id : TEXT <<UNIQUE>>
+    * dept_id : INTEGER <<FK>>
+    title : TEXT
+    office_location : TEXT
+    office_hours : TEXT
+}
+
+' DEPARTMENTS Entity
+entity "DEPARTMENTS" as departments {
+    * id : INTEGER <<PK>>
+    --
+    * dept_code : TEXT <<UNIQUE>>
+    * dept_name : TEXT
+    created_at : DATETIME
+}
+
+' COURSES Entity
+entity "COURSES" as courses {
+    * id : INTEGER <<PK>>
+    --
+    * course_code : TEXT <<UNIQUE>>
+    * course_name : TEXT
+    description : TEXT
+    * credits : INTEGER
+    * dept_id : INTEGER <<FK>>
+    course_type : TEXT
+    created_at : DATETIME
+}
+
+' COURSE_PREREQUISITES Entity
+entity "COURSE_PREREQUISITES" as prerequisites {
+    * id : INTEGER <<PK>>
+    --
+    * course_id : INTEGER <<FK>>
+    * prerequisite_course_id : INTEGER <<FK>>
+    minimum_grade : TEXT
+}
+
+' SEMESTERS Entity
+entity "SEMESTERS" as semesters {
+    * id : INTEGER <<PK>>
+    --
+    * semester_code : TEXT <<UNIQUE>>
+    * semester_name : TEXT
+    * start_date : DATE
+    * end_date : DATE
+    registration_start : DATE
+    registration_end : DATE
+    * is_active : INTEGER
+    created_at : DATETIME
+}
+
+' TIME_SLOTS Entity
+entity "TIME_SLOTS" as time_slots {
+    * id : INTEGER <<PK>>
+    --
+    * day_of_week : TEXT
+    * start_time : TIME
+    * end_time : TIME
+    created_at : DATETIME
+}
+
+' COURSE_SECTIONS Entity
+entity "COURSE_SECTIONS" as sections {
+    * id : INTEGER <<PK>>
+    --
+    * section_code : TEXT <<UNIQUE>>
+    * course_id : INTEGER <<FK>>
+    * semester_id : INTEGER <<FK>>
+    * instructor_id : INTEGER <<FK>>
+    * max_capacity : INTEGER
+    * current_enrollment : INTEGER
+    room_location : TEXT
+    created_at : DATETIME
+}
+
+' SECTION_TIME_SLOTS Entity (Junction)
+entity "SECTION_TIME_SLOTS" as section_times {
+    * id : INTEGER <<PK>>
+    --
+    * section_id : INTEGER <<FK>>
+    * time_slot_id : INTEGER <<FK>>
+}
+
+' ENROLLMENTS Entity
+entity "ENROLLMENTS" as enrollments {
+    * id : INTEGER <<PK>>
+    --
+    * student_id : INTEGER <<FK>>
+    * section_id : INTEGER <<FK>>
+    * enrollment_status : TEXT
+    final_grade : TEXT
+    numeric_grade : REAL
+    grade_points : REAL
+    enrolled_at : DATETIME
+    updated_at : DATETIME
+}
+
+' GRADE_SCALE Entity
+entity "GRADE_SCALE" as grade_scale {
+    * id : INTEGER <<PK>>
+    --
+    * letter_grade : TEXT <<UNIQUE>>
+    * min_percentage : REAL
+    * max_percentage : REAL
+    * grade_points : REAL
+}
+
+' Relationships
+users ||--o{ students : "has profile"
+users ||--o{ instructors : "has profile"
+
+departments ||--o{ instructors : "employs"
+departments ||--o{ courses : "offers"
+
+courses ||--o{ prerequisites : "requires"
+courses ||--o{ prerequisites : "is prerequisite for"
+courses ||--o{ sections : "has"
+
+semesters ||--o{ sections : "contains"
+
+instructors ||--o{ sections : "teaches"
+
+sections ||--o{ section_times : "scheduled at"
+time_slots ||--o{ section_times : "used by"
+
+students ||--o{ enrollments : "enrolled in"
+sections ||--o{ enrollments : "has students"
+
+@enduml

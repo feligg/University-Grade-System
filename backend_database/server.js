@@ -101,6 +101,7 @@ const isAdmin = (req, res, next) => {
 };
 
 //====================Auth Route====================
+//Login
 app.post('/api/auth/login', async (req, res) => {
   try {
     const { user_id, password } = req.body;
@@ -128,6 +129,7 @@ app.post('/api/auth/login', async (req, res) => {
   }
 });
 
+//Register
 app.post('/api/auth/register', async (req, res) => {
   try {
     const { user_id, name, email, password, user_type, ...additionalData } = req.body;
@@ -180,6 +182,7 @@ app.post('/api/auth/register', async (req, res) => {
   }
 });
 
+//Token 
 app.get('/api/auth/verify', authenticateToken, async (req, res) => {
   try {
     const user = await findUserById(req.userId);
@@ -194,6 +197,7 @@ app.get('/api/auth/verify', authenticateToken, async (req, res) => {
 });
 
 //====================Student Route====================
+//with GPA
 app.get('/api/student/profile', authenticateToken, async (req, res) => {
   try {
     const student = await getStudentByUserId(req.userId);
@@ -208,6 +212,7 @@ app.get('/api/student/profile', authenticateToken, async (req, res) => {
   }
 });
 
+//enrollment
 app.get('/api/student/enrollments', authenticateToken, async (req, res) => {
   try {
     const student = await getStudentByUserId(req.userId);
@@ -222,6 +227,8 @@ app.get('/api/student/enrollments', authenticateToken, async (req, res) => {
   }
 });
 
+//student directory
+//all student 
 app.get('/api/students', authenticateToken, async (req, res) => {
   try {
     const students = await getAllStudents();
@@ -232,6 +239,7 @@ app.get('/api/students', authenticateToken, async (req, res) => {
   }
 });
 
+//specific student enrollment
 app.get('/api/students/:id/enrollments', authenticateToken, async (req, res) => {
   try {
     const enrollments = await getStudentEnrollments(req.params.id);
@@ -243,6 +251,7 @@ app.get('/api/students/:id/enrollments', authenticateToken, async (req, res) => 
 });
 
 //====================Instructor Route====================
+//get profile
 app.get('/api/instructor/profile', authenticateToken, async (req, res) => {
   try {
     const instructor = await getInstructorByUserId(req.userId);
@@ -256,6 +265,7 @@ app.get('/api/instructor/profile', authenticateToken, async (req, res) => {
   }
 });
 
+//all instructor
 app.get('/api/instructors', authenticateToken, async (req, res) => {
   try {
     const instructors = await getAllInstructors();
@@ -266,6 +276,7 @@ app.get('/api/instructors', authenticateToken, async (req, res) => {
   }
 });
 
+//instructor course
 app.get('/api/instructors/:id/courses', authenticateToken, async (req, res) => {
   try {
     const courses = await allQuery(
@@ -285,6 +296,7 @@ app.get('/api/instructors/:id/courses', authenticateToken, async (req, res) => {
 });
 
 //====================Course Route====================
+//get all course
 app.get('/api/courses', authenticateToken, async (req, res) => {
   try {
     const courses = await getAllCourses();
@@ -295,6 +307,7 @@ app.get('/api/courses', authenticateToken, async (req, res) => {
   }
 });
 
+//get single course
 app.get('/api/courses/:id', authenticateToken, async (req, res) => {
   try {
     const course = await getCourseById(req.params.id);
@@ -308,6 +321,7 @@ app.get('/api/courses/:id', authenticateToken, async (req, res) => {
   }
 });
 
+//get course section
 app.get('/api/courses/:id/sections', authenticateToken, async (req, res) => {
   try {
     const sections = await getCourseWithSections(req.params.id);
@@ -603,7 +617,7 @@ app.put('/api/instructors/:id', authenticateToken, isAdmin, async (req, res) => 
     const { id } = req.params;
     const { name, email, dept_id, title, office_location, office_hours, contact_phone } = req.body;
 
-    //Get the instructor record to find user_id
+    //Get the instructor record to find user id
     const instructor = await getQuery('SELECT user_id FROM instructors WHERE id = ?', [id]);
     
     if (!instructor) {
@@ -663,3 +677,6 @@ process.on('SIGINT', () => {
   console.log('Shutting down server...');
   process.exit(0);
 });
+
+
+

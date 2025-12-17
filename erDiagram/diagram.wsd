@@ -172,3 +172,6 @@ students ||--o{ enrollments : "enrolled in"
 sections ||--o{ enrollments : "has students"
 
 @enduml
+
+
+

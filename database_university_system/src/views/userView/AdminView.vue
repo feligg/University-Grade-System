@@ -5,7 +5,7 @@
       <p class="subtitle">Manage courses, students, and instructors</p>
     </div>
 
-    <!-- Tab Navigation -->
+    <!--Tab Navigation-->
     <div class="tabs">
       <button 
         @click="activeTab = 'courses'" 
@@ -27,7 +27,7 @@
       </button>
     </div>
 
-    <!-- Courses Tab -->
+    <!--Courses Tab-->
     <div v-if="activeTab === 'courses'" class="tab-content">
       <div class="action-bar">
         <h2>Course Management</h2>
@@ -78,7 +78,7 @@
       </div>
     </div>
 
-    <!-- Students Tab -->
+    <!--Students Tab-->
     <div v-if="activeTab === 'students'" class="tab-content">
       <div class="action-bar">
         <h2>Student Management</h2>
@@ -119,7 +119,7 @@
       </div>
     </div>
 
-    <!-- Instructors Tab -->
+    <!--Instructors Tab-->
     <div v-if="activeTab === 'instructors'" class="tab-content">
       <div class="action-bar">
         <h2>Instructor Management</h2>
@@ -161,7 +161,7 @@
     </div>
 
    
-    <!-- Course Modal -->
+    <!--Course Modal-->
     <div v-if="showCourseModal" class="modal-overlay" @click="closeCourseModal">
       <div class="modal-content" @click.stop>
         <div class="modal-header">
@@ -238,7 +238,7 @@
 
             <div class="form-group">
               <label>Assign Instructor</label>
-              <select v-model.number="courseForm.instructor_id" >
+              <select v-model.number="courseForm.instructor_id" required>
                 <option :value="null">No Instructor Assigned</option>
                 <option v-for="instructor in instructors" :key="instructor.id" :value="instructor.id">
                   {{ instructor.name }} ({{ instructor.instructor_id }}) - {{ instructor.dept_name }}
@@ -264,7 +264,7 @@
       </div>
     </div>
 
-    <!-- Student Modal -->
+    <!--Student Modal-->
     <div v-if="showStudentModal" class="modal-overlay" @click="closeStudentModal">
       <div class="modal-content" @click.stop>
         <div class="modal-header">
@@ -352,7 +352,7 @@
       </div>
     </div>
 
-    <!-- Instructor Modal -->
+    <!--Instructor Modal-->
     <div v-if="showInstructorModal" class="modal-overlay" @click="closeInstructorModal">
       <div class="modal-content" @click.stop>
         <div class="modal-header">
@@ -440,7 +440,7 @@ import { useAuthStore } from '@/components/stores/auth';
 
 const authStore = useAuthStore();
 
-// State
+//State
 const activeTab = ref('courses');
 const loading = ref(false);
 const saving = ref(false);
@@ -492,7 +492,7 @@ const instructorForm = ref({
   contact_phone: ''
 });
 
-// Methods
+//Methods
 const fetchCourses = async () => {
   loading.value = true;
   try {
@@ -749,7 +749,7 @@ watch(activeTab, (newTab) => {
   }
 });
 
-// Lifecycle
+//Lifecycle
 onMounted(() => {
   fetchCourses();
   fetchDepartments();
@@ -1133,4 +1133,3 @@ onMounted(() => {
   }
 }
 </style>
-

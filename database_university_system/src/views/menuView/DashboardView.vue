@@ -1,6 +1,6 @@
 <template>
   <div class="dashboard">
-    <!-- Dashboard Header -->
+    <!--Dashboard Header-->
     <div class="dashboard-header">
       <div>
         <h1>Welcome, {{ displayName }}!</h1>
@@ -10,19 +10,19 @@
       <button @click="handleLogout" class="btn-logout">Logout</button>
     </div>
 
-    <!-- Loading State -->
+    <!--Loading State-->
     <div v-if="loading" class="loading-container">
       <div class="spinner"></div>
       <p>Loading profile...</p>
     </div>
 
-    <!-- Error State -->
+    <!--Error State-->
     <div v-else-if="error" class="error-container">
       <p>⚠️ {{ error }}</p>
       <button @click="loadProfile" class="btn-retry">Retry</button>
     </div>
 
-    <!-- Student Dashboard -->
+    <!--Student Dashboard-->
     <div v-else-if="authStore.isStudent" class="dashboard-content">
       <div class="stats-grid">
         <div class="stat-card">
@@ -128,7 +128,7 @@
       </div>
     </div>
 
-    <!-- Instructor Dashboard -->
+    <!--Instructor Dashboard-->
     <div v-else-if="authStore.isInstructor" class="dashboard-content">
       <div class="stats-grid">
         <div class="stat-card">
@@ -237,7 +237,7 @@
       </div>
     </div>
 
-    <!-- Admin Dashboard -->
+    <!--Admin Dashboard-->
     <div v-else-if="authStore.isAdmin" class="dashboard-content">
       <div class="card admin-welcome">
         <h2>Administrator Panel</h2>
@@ -259,14 +259,14 @@ import { useAuthStore } from '@/components/stores/auth'
 const router = useRouter()
 const authStore = useAuthStore()
 
-// State
+//State
 const loading = ref(false)
 const error = ref(null)
 const profile = ref(null)
 const enrollments = ref([])
 const instructorCourses = ref([])
 
-// Computed
+//Computed
 const displayName = computed(() => {
   if (profile.value?.name) return profile.value.name
   if (authStore.user?.name) return authStore.user.name
@@ -303,17 +303,17 @@ const instructorStats = computed(() => {
   return { totalSections, totalStudents }
 })
 
-// Methods
+//Methods
 const loadProfile = async () => {
   loading.value = true
   error.value = null
   
   try {
-    // Fetch profile from auth store
+    //Fetch profile from auth store
     await authStore.fetchFullProfile()
     profile.value = authStore.profile
 
-    // Load additional data based on user type
+    //Load additional data based on user type
     if (authStore.isStudent) {
       await loadStudentEnrollments()
     } else if (authStore.isInstructor) {

@@ -7,7 +7,7 @@
       </p>
     </div>
 
-    <!-- Search and Filter -->
+    <!--Search and Filter-->
     <div class="filters-section">
       <div class="filter-group">
         <label>Search:</label>
@@ -42,19 +42,19 @@
       </div>
     </div>
 
-    <!-- Loading State -->
+    <!--Loading State-->
     <div v-if="loading" class="loading-container">
       <div class="spinner"></div>
       <p>Loading students...</p>
     </div>
 
-    <!-- Error State -->
+    <!--Error State-->
     <div v-else-if="error" class="error-container">
       <p class="error-message">❌ {{ error }}</p>
       <button @click="fetchStudents" class="btn-retry">Retry</button>
     </div>
 
-    <!-- Students Table -->
+    <!--Students Table-->
     <div v-else class="students-container">
       <div class="table-wrapper">
         <table class="students-table">
@@ -108,13 +108,13 @@
         </table>
       </div>
 
-      <!-- Empty State -->
+      <!--Empty State-->
       <div v-if="filteredStudents.length === 0" class="empty-state">
         <p>🔭 No students found matching your criteria</p>
       </div>
     </div>
 
-    <!-- Student Details Modal -->
+    <!--Student Details Modal-->
     <div v-if="selectedStudent && !showGradeModal" class="modal-overlay" @click="selectedStudent = null">
       <div class="modal-content" @click.stop>
         <div class="modal-header">
@@ -190,7 +190,7 @@
       </div>
     </div>
 
-    <!-- Grade Management Modal (Instructor Only) -->
+    <!--Grade Management Modal (Instructor Only)-->
     <div v-if="showGradeModal && selectedStudent" class="modal-overlay" @click="closeGradeModal">
       <div class="modal-content grade-modal" @click.stop>
         <div class="modal-header">
@@ -278,7 +278,7 @@ import { useAuthStore } from '@/components/stores/auth';
 
 const authStore = useAuthStore();
 
-// State
+//State
 const students = ref([]);
 const selectedStudent = ref(null);
 const studentEnrollments = ref([]);
@@ -291,7 +291,7 @@ const selectedYear = ref('');
 const showGradeModal = ref(false);
 const savingGrade = ref(null);
 
-// Computed
+//Computed
 const isInstructor = computed(() => authStore.user?.user_type === 'instructor');
 
 const filteredStudents = computed(() => {
@@ -308,7 +308,7 @@ const filteredStudents = computed(() => {
   });
 });
 
-// Methods
+//Methods
 const fetchStudents = async () => {
   loading.value = true;
   error.value = null;
@@ -400,7 +400,7 @@ const calculateLetterGrade = (enrollment) => {
   else if (score >= 50) enrollment.final_grade = 'D';
   else enrollment.final_grade = 'F';
   
-  // Auto-set status based on grade
+  //Auto set status based on grade
   if (score >= 50 && enrollment.enrollment_status === 'enrolled') {
     enrollment.enrollment_status = 'passed';
   } else if (score < 50 && enrollment.enrollment_status === 'enrolled') {
@@ -443,14 +443,13 @@ const formatDate = (dateStr) => {
   return new Date(dateStr).toLocaleDateString();
 };
 
-// Lifecycle
+//Lifecycle
 onMounted(() => {
   fetchStudents();
 });
 </script>
 
 <style scoped>
-/* Previous styles... */
 .students-page {
   max-width: 1400px;
   margin: 0 auto;
@@ -804,7 +803,7 @@ onMounted(() => {
   font-weight: 600;
 }
 
-/* Grade Management Styles */
+/* Grade Management*/
 .grades-list {
   display: flex;
   flex-direction: column;

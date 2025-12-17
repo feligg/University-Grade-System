@@ -5,7 +5,7 @@
       <p class="subtitle">Browse and manage faculty information</p>
     </div>
 
-    <!-- Search and Filter -->
+    <!--Search and Filter-->
     <div class="filters-section">
       <div class="filter-group">
         <label>Search:</label>
@@ -39,19 +39,19 @@
       </div>
     </div>
 
-    <!-- Loading State -->
+    <!--Loading State-->
     <div v-if="loading" class="loading-container">
       <div class="spinner"></div>
       <p>Loading faculty...</p>
     </div>
 
-    <!-- Error State -->
+    <!--Error State-->
     <div v-else-if="error" class="error-container">
       <p class="error-message">❌ {{ error }}</p>
       <button @click="fetchFaculty" class="btn-retry">Retry</button>
     </div>
 
-    <!-- Faculty Grid -->
+    <!--Faculty Grid-->
     <div v-else class="faculty-grid">
       <div 
         v-for="instructor in filteredFaculty" 
@@ -113,12 +113,12 @@
       </div>
     </div>
 
-    <!-- Empty State -->
+    <!--Empty State-->
     <div v-if="!loading && filteredFaculty.length === 0" class="empty-state">
       <p>📭 No faculty members found matching your criteria</p>
     </div>
 
-    <!-- Faculty Details Modal -->
+    <!--Faculty Modal-->
     <div v-if="selectedFaculty" class="modal-overlay" @click="selectedFaculty = null">
       <div class="modal-content" @click.stop>
         <div class="modal-header">
@@ -205,7 +205,7 @@ import { useAuthStore } from '@/components/stores/auth';
 
 const authStore = useAuthStore();
 
-// State
+//State
 const faculty = ref([]);
 const selectedFaculty = ref(null);
 const facultyCourses = ref([]);
@@ -215,7 +215,7 @@ const searchTerm = ref('');
 const selectedDept = ref('');
 const selectedTitle = ref('');
 
-// Computed
+//Computed
 const isAdmin = computed(() => authStore.user?.user_type === 'admin');
 
 const filteredFaculty = computed(() => {
@@ -232,7 +232,7 @@ const filteredFaculty = computed(() => {
   });
 });
 
-// Methods
+//Method
 const fetchFaculty = async () => {
   loading.value = true;
   error.value = null;
@@ -290,7 +290,7 @@ const getTitleClass = (title) => {
   return 'default';
 };
 
-// Lifecycle
+//Lifecycle
 onMounted(() => {
   fetchFaculty();
 });

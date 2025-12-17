@@ -1,6 +1,5 @@
 <template>
   <div class="home">
-    <!-- Hero Section -->
     <section class="hero">
       <div class="hero-content">
         <h1 class="hero-title">
@@ -34,7 +33,6 @@
 </template>
 
 <script setup>
-// Home page logic
 </script>
 
 <style scoped>
@@ -42,7 +40,6 @@
   min-height: calc(100vh - 70px);
 }
 
-/* Hero Section */
 .hero {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -147,7 +144,7 @@
   color: rgba(255, 255, 255, 0.8);
 }
 
-/* Features Section */
+/*Features*/
 .features {
   padding: 5rem 2rem;
   background: #f8fafc;
@@ -203,7 +200,7 @@
   line-height: 1.6;
 }
 
-/* Responsive Design */
+/*Responsive Design*/
 @media (max-width: 768px) {
   .hero {
     grid-template-columns: 1fr;

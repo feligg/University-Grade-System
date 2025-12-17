@@ -1,9 +1,9 @@
 <template>
   <div id="app">
-    <!-- Complex Navbar -->
+    <!--Navbar-->
     <nav class="navbar">
       <div class="navbar-container">
-        <!-- Logo/Brand Section -->
+        <!--Logo/Brand Section-->
         <div class="navbar-brand">
           <router-link to="/" class="brand-link">
             <img src="@/assets/scut_logo.png" alt="SCUT Logo" class="brand-logo" />
@@ -11,7 +11,7 @@
           </router-link>
         </div>
 
-        <!-- Navigation Links -->
+        <!--Navigation Links-->
         <div class="navbar-menu" :class="{ active: isMenuOpen }">
           <div class="navbar-links">
             <router-link to="/" class="nav-link" active-class="active" @click="closeMenu">
@@ -19,7 +19,7 @@
               <span>Home</span>
             </router-link>
             
-            <!-- Show Dashboard only when authenticated -->
+            <!--Show Dashboard only when authenticated-->
             <router-link 
               v-if="authStore.isAuthenticated" 
               to="/dashboard" 
@@ -31,7 +31,7 @@
               <span>Dashboard</span>
             </router-link>
 
-            <!-- Academics Dropdown - Show only when authenticated -->
+            <!--Academics Dropdown Show only when authenticated-->
             <div v-if="authStore.isAuthenticated" class="nav-dropdown">
               <button class="nav-link dropdown-trigger" @click="toggleDropdown">
                 <span class="nav-icon">📚</span>
@@ -51,7 +51,7 @@
               </div>
             </div>
 
-            <!-- Admin Panel Link - Show only for admin users -->
+            <!--Admin Panel Link Show only for admin user-->
             <router-link 
               v-if="authStore.isAdmin" 
               to="/admin" 
@@ -64,9 +64,9 @@
             </router-link>
           </div>
 
-          <!-- User Section -->
+          <!--User Section-->
           <div class="navbar-user">
-            <!-- Show Login/Register when not authenticated -->
+            <!--Show Login/Register when not authenticated-->
             <template v-if="!authStore.isAuthenticated">
               <router-link to="/login" class="nav-link login-btn" @click="closeMenu">
                 <span class="nav-icon">👤</span>
@@ -78,7 +78,7 @@
               </router-link>
             </template>
 
-            <!-- Show User Info and Logout when authenticated -->
+            <!--Show User Info and Logout when authenticated-->
             <template v-else>
               <div class="user-info">
                 <div class="user-avatar">
@@ -97,7 +97,7 @@
           </div>
         </div>
 
-        <!-- Mobile Menu Toggle -->
+        <!--Mobile Menu Toggle-->
         <button class="navbar-toggle" @click="toggleMenu" aria-label="Toggle navigation">
           <span class="toggle-icon"></span>
           <span class="toggle-icon"></span>
@@ -106,7 +106,6 @@
       </div>
     </nav>
 
-    <!-- Main Content Area -->
     <main class="main-content">
       <router-view />
     </main>
@@ -177,7 +176,7 @@ const formatRole = (role) => {
   background: #f5f5f5;
 }
 
-/* Navbar - Fixed at Top Only */
+/*Navbar*/
 .navbar {
   position: fixed;
   top: 0;
@@ -200,7 +199,7 @@ const formatRole = (role) => {
   height: 100%;
 }
 
-/* Brand Section */
+/*Logo*/
 .navbar-brand {
   display: flex;
   align-items: center;
@@ -231,7 +230,7 @@ const formatRole = (role) => {
   text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
 }
 
-/* Navigation Menu */
+/*Navigation Menu*/
 .navbar-menu {
   display: flex;
   align-items: center;
@@ -294,7 +293,7 @@ const formatRole = (role) => {
   font-size: 1.2rem;
 }
 
-/* Admin Link Special Styling */
+/* Admin Link*/
 .admin-link {
   background: rgba(255, 215, 0, 0.2);
   border: 2px solid rgba(255, 215, 0, 0.3);
@@ -310,7 +309,7 @@ const formatRole = (role) => {
   border-color: gold;
 }
 
-/* Dropdown */
+/*Dropdown*/
 .nav-dropdown {
   position: relative;
 }
@@ -363,7 +362,7 @@ const formatRole = (role) => {
   padding-left: 2rem;
 }
 
-/* User Section */
+/*User Section*/
 .navbar-user {
   display: flex;
   align-items: center;
@@ -436,7 +435,7 @@ const formatRole = (role) => {
   border-color: #ef4444;
 }
 
-/* Mobile Toggle */
+/*Mobile Toggle*/
 .navbar-toggle {
   display: none;
   flex-direction: column;
@@ -455,13 +454,13 @@ const formatRole = (role) => {
   transition: all 0.3s ease;
 }
 
-/* Main Content - Pushes content below fixed navbar */
+/*Main Content*/
 .main-content {
   margin-top: 70px;
   min-height: calc(100vh - 70px);
 }
 
-/* Responsive Design */
+/*Responsive Design*/
 @media (max-width: 1024px) {
   .navbar-links {
     gap: 1rem;

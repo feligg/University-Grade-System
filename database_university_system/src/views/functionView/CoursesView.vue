@@ -5,7 +5,7 @@
       <p class="subtitle">Browse and enroll in available courses</p>
     </div>
 
-    <!-- Filters -->
+    <!--Filters-->
     <div class="filters-section">
       <div class="filter-group">
         <label>Search:</label>
@@ -40,19 +40,19 @@
       </div>
     </div>
 
-    <!-- Loading State -->
+    <!--Loading State-->
     <div v-if="loading" class="loading-container">
       <div class="spinner"></div>
       <p>Loading courses...</p>
     </div>
 
-    <!-- Error State -->
+    <!--Error State-->
     <div v-else-if="error" class="error-container">
       <p class="error-message">❌ {{ error }}</p>
       <button @click="fetchCourses" class="btn-retry">Retry</button>
     </div>
 
-    <!-- Courses Grid -->
+    <!--Courses Grid-->
     <div v-else class="courses-grid">
       <div 
         v-for="course in filteredCourses" 
@@ -99,12 +99,12 @@
       </div>
     </div>
 
-    <!-- Empty State -->
+    <!--Empty State-->
     <div v-if="!loading && !error && filteredCourses.length === 0" class="empty-state">
       <p>🔭 No courses found matching your criteria</p>
     </div>
 
-    <!-- Course Details Modal -->
+    <!--Course Details Modal-->
     <div v-if="selectedCourse" class="modal-overlay" @click="selectedCourse = null">
       <div class="modal-content" @click.stop>
         <div class="modal-header">
@@ -151,7 +151,7 @@ import { useAuthStore } from '@/components/stores/auth';
 
 const authStore = useAuthStore();
 
-// State
+//State
 const courses = ref([]);
 const courseSections = ref([]);
 const selectedCourse = ref(null);
@@ -162,7 +162,7 @@ const selectedDept = ref('');
 const selectedType = ref('');
 const enrolledCourses = ref([]);
 
-// Computed
+//Computed
 const isStudent = computed(() => authStore.user?.user_type === 'student');
 
 const filteredCourses = computed(() => {
@@ -175,7 +175,7 @@ const filteredCourses = computed(() => {
   });
 });
 
-// Methods
+//Method
 const fetchCourses = async () => {
   loading.value = true;
   error.value = null;
@@ -290,7 +290,7 @@ const formatCourseType = (type) => {
   return types[type] || type;
 };
 
-// Lifecycle
+//Lifecycle
 onMounted(() => {
   fetchCourses();
   fetchEnrolledCourses();
@@ -298,7 +298,6 @@ onMounted(() => {
 </script>
 
 <style scoped>
-/* Previous styles remain the same */
 .courses-page {
   max-width: 1400px;
   margin: 0 auto;

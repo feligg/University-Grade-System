@@ -18,9 +18,8 @@ const handleLogin = async (credentials) => {
   const result = await authStore.login(student_id, password)
   
   if (result.success) {
-    router.push('/dashboard')  // Only redirect on success
+    router.push('/dashboard') 
   }
-  // Handle errors through the store's error state
 }
 
 </script>
